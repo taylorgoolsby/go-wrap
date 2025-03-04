@@ -190,7 +190,7 @@
     }
     .future {
       opacity: 0.29;
-      margin-top: 70px;
+      margin-top: 50px;
       margin-left: 50px;
     }
     ul {
@@ -210,7 +210,7 @@
       overflow: hidden;
       outline: none;
 
-      > * {
+      > *.go-wrap {
         display: flex;
         flex-direction: column;
         align-items: stretch;
@@ -247,13 +247,13 @@
       }
     }
     .model-wrapping-dialog {
-      margin-top: 280px;
+      margin-top: 296px;
     }
-    .model-wrapping-dialog-wrap.model-wrapping-dialog-wrap {
+    .model-wrapping-dialog-wrap.model-wrapping-dialog-wrap.model-wrapping-dialog-wrap {
       margin-top: 0;
     }
-    .feature-dialog-wrap {
-      margin-top: 69px;
+    .feature-dialog-wrap.feature-dialog-wrap {
+      margin-top: 90px;
       width: 425px;
       padding: 18px 25px;
     }
@@ -346,6 +346,10 @@
     a.icon {
       line-height: 0;
       margin-bottom: 1px;
+
+      svg {
+        pointer-events: none;
+      }
     }
     a.icon:hover {
       svg {
@@ -511,14 +515,14 @@
 </div>
 
 <dialog id="feature-dialog">
-  <div class="feature-dialog-wrap">
+  <div class="go-wrap feature-dialog-wrap">
     <span class="feature-dialog-title">TITLE</span>
     <span class="feature-dialog-description">DESCRIPTION</span>
   </div>
 </dialog>
 
 <dialog id="waitlist-dialog">
-  <form id="wait-wrap">
+  <form id="wait-wrap" class="go-wrap">
     <span class="form-title">WAITLIST</span>
     <div class="flex row">
       <label for="firstName">FIRST NAME: </label>
@@ -540,7 +544,7 @@
       JOIN
     </button>
   </form>
-  <div class="completion">
+  <div class="go-wrap completion">
     <span>THANK YOU FOR JOINING THE WAITLIST</span>
     <span>WE WILL NOTIFY YOU WHEN WE ARE READY</span>
   </div>
@@ -562,8 +566,50 @@
 
   let coloredPieces = 0
 
+  const chirp = new Audio('chirp.wav'); // Replace with your file name
+
+  // select all button, a, and td elements, and make tap play on click
+  document.querySelectorAll('button, a, td').forEach(el => el.addEventListener('click', () => {
+    // play pew.wav pew2.wav or tap.wav randomly
+    // const random = Math.random()
+    // if (random < 0.33) {
+    //   const pew = new Audio('pew.wav')
+    //   pew.play()
+    // } else if (random < 0.66) {
+    //   const pew2 = new Audio('pew2.wav')
+    //   pew2.play()
+    // } else {
+    //   const pew2 = new Audio('pew2.wav')
+    //   pew2.play()
+    //
+    // }
+    const tap = new Audio('tap.wav')
+    tap.play()
+  }))
+  // select all dialogs, and on close, play 'swipe+place.wav'
+  document.querySelectorAll('dialog').forEach(el => el.addEventListener('close', () => {
+    const swipe = new Audio('swipe+place.wav')
+    swipe.play()
+    disableHoverSound = true
+    setTimeout(() => {
+      disableHoverSound = false
+    }, 16)
+  }))
+
+  // select all buttons, a, and td elements, and on hover, play 'move-block.wav'
+  let disableHoverSound = false
+  document.querySelectorAll('button, a, td').forEach(el => el.addEventListener('mouseover', () => {
+    setTimeout(() => {
+      if (disableHoverSound) return
+      // check if the element is disabled
+      if (el.hasAttribute('disabled')) return
+      const moveBlock = new Audio('bloop.wav')
+      moveBlock.play()
+    }, 0)
+  }))
+
   const featureDescriptions = {
-    'OS MODEL': '<strong class="blue">Model wrapping</strong> is the process of taking an <strong class="green">open-source</strong> <strong class="blue">AI model</strong> from <strong class="orange">HuggingFace</strong> and adding essential features like chat interfaces, APIs, <strong class="green">long-term</strong> <strong class="blue">memory</strong>, function calling, and multimodal capabilities to make it fully interactive.<br><br>Services like <strong class="red">ChatGPT</strong> and <strong class="red">Claude</strong> wrap their <strong class="blue">core models</strong> with these features, turning them into <strong>full AI assistants</strong>, while <strong class="green">open-source</strong> models like <strong class="orange">LLaMA</strong>, <strong class="orange">Mixtral</strong>, or <strong class="orange">Phi</strong> require external infrastructure to achieve the same functionality.<br><br><strong class="green">Go-Wrap</strong> provides this infrastructure, enabling any <strong class="green">open-source</strong> <strong class="blue">model</strong> <strong>to match the capabilities of <strong class="red">proprietary</strong> AI assistants</strong> while maintaining full control over data, customization, and transfer learning.<br><br>By managing versioning and continuous <strong class="green">fine-tuning</strong>, <strong class="green">Go-Wrap</strong> ensures <strong class="blue">model</strong> <strong class="red">evolution</strong> is <strong class="blue">maintained</strong> through <strong class="green">long-term</strong> <strong class="red">care</strong>, making <strong class="green">open-source</strong> <strong class="blue">AI</strong> <strong class="green">feature-complete</strong>, <strong class="green">self-improving</strong> and <strong class="blue">reliably yours</strong>.',
+    'OS MODEL': '<strong class="blue">Model wrapping</strong> is the process of taking an <strong class="green">open-source</strong> <strong class="blue">AI model</strong> from <strong class="orange">HuggingFace</strong> and adding essential features like chat interfaces, APIs, <strong class="green">long-term</strong> <strong class="blue">memory</strong>, function calling, and multimodal capabilities to make it fully interactive.<br><br>Services like <strong class="red">ChatGPT</strong> and <strong class="red">Claude</strong> wrap their <strong class="blue">core models</strong> with these features, turning them into <strong>full AI assistants</strong>, while <strong class="green">open-source</strong> <strong class="orange">models</strong> like <strong class="orange">LLaMA</strong>, <strong class="orange">Mixtral</strong>, or <strong class="orange">Phi</strong> require external infrastructure to achieve the same functionality.<br><br><strong class="green">Go-Wrap</strong> provides this infrastructure, enabling any <strong class="green">open-source</strong> <strong class="blue">model</strong> <strong>to match the capabilities of <strong class="red">proprietary</strong> AI assistants</strong> while maintaining full control over data, customization, and transfer learning.<br><br>By managing versioning and continuous <strong class="green">fine-tuning</strong>, <strong class="green">Go-Wrap</strong> ensures <strong class="blue">model</strong> <strong class="red">evolution</strong> is <strong class="blue">maintained</strong> through <strong class="green">long-term</strong> <strong class="red">care</strong>, making <strong class="green">open-source</strong> <strong class="blue">AI</strong> <strong class="green">feature-complete</strong>, <strong class="green">self-improving</strong> and <strong class="blue">reliably yours</strong>.',
     'SERVERLESS CHAT API': 'A chat API for interacting with any bots you create. Uses modal.com for serverless AI infrastructure.',
     'CHAT INTERFACE': 'We provide a conversational chat interface for interacting with any bots you create.',
     'FUNCTION CALLING': 'Give your model function calling capabilities to interact with the world. Write your own plugins.',
@@ -685,6 +731,10 @@
       const newColor = 'rgb(223, 255, 225)'
       e.target.style.backgroundColor = newColor
       coloredPieces++
+      if (coloredPieces === 13) {
+        const pew = new Audio('pew.wav')
+        pew.play()
+      }
     } else if (currentColor === 'rgb(223, 255, 225)') {
       const newColor = 'rgb(250, 234, 214)'
       e.target.style.backgroundColor = newColor
@@ -699,6 +749,7 @@
     if (coloredPieces === 13) {
       // give the rainbow-text class
       document.getElementById('rainbow-text').classList.add('rainbow-text')
+      reveal()
     } else {
       document.getElementById('rainbow-text').classList.remove('rainbow-text')
     }
@@ -706,6 +757,8 @@
 
   document.getElementById('wait-wrap').addEventListener('submit', async (e) => {
     e.preventDefault()
+
+    aborted = false
 
     const formData = new FormData(e.target);
     const values = Object.fromEntries(formData.entries()); // Converts FormData to an object
@@ -734,10 +787,12 @@
     const data = await res.json()
     console.log('data', data)
 
+    if (aborted) return
+
     // copy the form width and height to the completion using the bounding box
     const waitWrap = document.getElementById('wait-wrap').getBoundingClientRect()
-    document.querySelector('.completion').style.width = `${waitWrap.width}px`
-    document.querySelector('.completion').style.height = `${waitWrap.height}px`
+    document.querySelector('.completion').style.width = `${waitWrap.width * 11/16}px`
+    document.querySelector('.completion').style.height = `${waitWrap.height * 11/16}px`
 
     // hide the form and show the completion
     document.getElementById('wait-wrap').style.display = 'none'
@@ -745,6 +800,13 @@
 
     console.log('submitted')
     e.target.reset()
+    chirp.play();
+  })
+
+  let aborted = false
+  // when the waitlist-dialog closes, abort the fetch
+  document.getElementById('waitlist-dialog').addEventListener('close', () => {
+    aborted = true
   })
 
   // attach close event to the dialogs
@@ -959,14 +1021,21 @@
 
   // generateZigzagPattern();
   // loadFromSnapshot()
+  let revealed = false
+  function reveal() {
+    if (!revealed) {
+      revealed = true
+      generateZigzagPattern();
+      requestAnimationFrame(loop)
+    }
+  }
 
   document.addEventListener("keydown", function (event) {
     if (event.metaKey && event.key.toLowerCase() === "e") {
       event.preventDefault(); // Prevent default browser behavior if needed
       console.log("Meta + E was pressed!");
       // Add your custom action here
-      generateZigzagPattern();
-      requestAnimationFrame(loop)
+      reveal()
     }
   });
 
