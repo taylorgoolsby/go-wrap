@@ -19,7 +19,12 @@
       font-size: 11px;
       color: #222227;
       margin: 0;
-      margin-top: -100px;
+      /*margin-top: -100px;*/
+      transform: scale(calc(16/11));
+      overflow: hidden;
+    }
+    dialog {
+      transform: scale(calc(16/11));
     }
     a {
       text-decoration: none;
@@ -126,6 +131,8 @@
       width: 108px;
       height: 54px;
       box-sizing: border-box;
+      cursor: pointer;
+      transition: opacity 80ms steps(1, end);
     }
     td:hover {
       /*background-color: #7a7aff30;*/
@@ -158,7 +165,7 @@
         opacity: 1;
       }
     }
-    button:active {
+    td:active,button:active {
       opacity: 0.3;
       transition: opacity 0ms;
     }
@@ -180,9 +187,9 @@
     /*}*/
     .footer {
       font-size: 11px;
-      opacity: 0.29;
     }
     .future {
+      opacity: 0.29;
       margin-top: 70px;
       margin-left: 50px;
     }
@@ -196,35 +203,35 @@
       flex-direction: row;
       align-items: center;
     }
-    #waitlist-dialog {
+    dialog {
       border: 0;
       padding: 0;
       background: transparent;
       overflow: hidden;
+      outline: none;
 
-      .completion {
-        display: none;
+      > * {
+        display: flex;
         flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        font-size: 11px;
+        align-items: stretch;
         border: 3px solid rgba(34, 34, 39, 0.97);
         border-radius: 2px;
         background-color: white;
+        padding: 7px 25px;
+      }
+    }
+    #waitlist-dialog {
+      .completion {
+        display: none;
         box-sizing: border-box;
+        justify-content: center;
+        align-items: center;
         padding: 0;
         /* width and height will be copied from #wait-wrap using JS */
       }
     }
     #wait-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      border: 3px solid rgba(34, 34, 39, 0.97);
-      border-radius: 2px;
-      background-color: white;
       width: 320px;
-      padding: 7px 25px;
 
       > .form-title {
         align-self: center;
@@ -237,6 +244,40 @@
         > *:first-child {
           flex: 1;
         }
+      }
+    }
+    .model-wrapping-dialog {
+      margin-top: 280px;
+    }
+    .model-wrapping-dialog-wrap.model-wrapping-dialog-wrap {
+      margin-top: 0;
+    }
+    .feature-dialog-wrap {
+      margin-top: 69px;
+      width: 425px;
+      padding: 18px 25px;
+    }
+    .feature-dialog-title {
+      display: flex;
+      flex-direction: row;
+      white-space: pre;
+      margin-bottom: 1rem;
+
+      strong {
+        color: white;
+        background-color: rgba(34, 34, 39, 0.97);
+        border-radius: 2px;
+        padding: 0px 3px;
+        font-weight: normal;
+      }
+    }
+    .feature-dialog-description {
+      strong {
+        color: white;
+        background-color: rgba(34, 34, 39, 0.97);
+        border-radius: 2px;
+        padding: 0px 3px;
+        font-weight: normal;
       }
     }
     input, textarea {
@@ -288,6 +329,71 @@
       border-radius: 2px;
       font-size: 11px;
     }
+    .model-wrapping-link {
+      text-decoration: underline;
+      cursor: pointer;
+      color: rgb(20, 53, 186);
+    }
+    .model-wrapping-link:hover {
+      color: #222227;
+    }
+    a.handle {
+      opacity: 0.29;
+    }
+    a.handle:hover {
+      opacity: 1;
+    }
+    a.icon {
+      line-height: 0;
+      margin-bottom: 1px;
+    }
+    a.icon:hover {
+      svg {
+        path,circle {
+          fill-opacity: 1;
+        }
+      }
+    }
+    strong {
+      &.green {
+        background-color: rgb(223, 255, 225);
+        color: #222227;
+      }
+      &.orange {
+        background-color: rgb(250, 234, 214);
+        color: #222227;
+      }
+      &.red {
+        background-color: rgb(255, 222, 231);
+        color: #222227;
+      }
+      &.blue {
+        background-color: rgba(197, 212, 255, 0.3);
+        color: #222227;
+      }
+    }
+    @keyframes rainbowScroll {
+      0% { background-position: 200% 50%; }
+      100% { background-position: 0% 50%; } /* Controls speed */
+    }
+
+    .rainbow-text {
+      background: linear-gradient(90deg,
+      hsl(0, 80%, 80%),
+      hsl(60, 80%, 80%),
+      hsl(120, 80%, 80%),
+      hsl(180, 80%, 80%),
+      hsl(240, 80%, 80%),
+      hsl(300, 80%, 80%),
+      hsl(360, 80%, 80%)
+      );
+      background-size: 200% 100%; /* Controls how far the gradient stretches */
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+      animation: rainbowScroll 3s linear infinite; /* Adjust speed by changing 3s */
+    }
+
   </style>
 </head>
 <body>
@@ -300,7 +406,7 @@
 
 <div class="container">
   <div>WELCOME TO GO-WRAP</div>
-  <div>WRAP ANY OS MODEL. MAKE IT FEATURE COMPLETE.</div>
+  <div>WRAP ANY <a class="model-wrapping-link" onclick="featureClick(event)">OS MODEL</a>. MAKE IT <span id="rainbow-text">FEATURE COMPLETE</span>.</div>
   <table>
     <tr>
       <td onclick="featureClick(event)">
@@ -364,9 +470,9 @@
   </div>
 </div>
 <div class="socials">
-  <div class="footer"><a href="https://x.com/tay2win" target="_blank" rel="noopener noreferrer">@taylorgoolsby</a></div>
+  <div class="footer"><a class="handle" href="https://x.com/tay2win" target="_blank" rel="noopener noreferrer">@taylorgoolsby</a></div>
   <div class="flex row">
-    <a href="https://github.com/taylorgoolsby/go-wrap" target="_blank" rel="noopener noreferrer" style="margin-right: 16px">
+    <a class="icon" href="https://github.com/taylorgoolsby/go-wrap" target="_blank" rel="noopener noreferrer" style="margin-right: 16px;">
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g clip-path="url(#clip0_4_13)">
           <path fill-rule="evenodd" clip-rule="evenodd" d="M7.00002 0.558136C3.35269 0.558136 0.395081 3.51509 0.395081 7.16307C0.395081 10.0814 2.2876 12.5571 4.91194 13.4306C5.24192 13.4918 5.36311 13.2873 5.36311 13.1129C5.36311 12.9554 5.35699 12.4351 5.35414 11.8832C3.51664 12.2827 3.12891 11.1039 3.12891 11.1039C2.82846 10.3404 2.39555 10.1374 2.39555 10.1374C1.79617 9.72748 2.44072 9.73601 2.44072 9.73601C3.10386 9.7825 3.45321 10.4167 3.45321 10.4167C4.0423 11.4262 4.99835 11.1344 5.37525 10.9657C5.43453 10.5388 5.60571 10.2473 5.7946 10.0824C4.32755 9.9156 2.78525 9.34915 2.78525 6.81832C2.78525 6.09721 3.04338 5.50801 3.46589 5.04535C3.39721 4.8791 3.17113 4.20732 3.52977 3.29754C3.52977 3.29754 4.0843 3.12003 5.34649 3.97457C5.87346 3.82812 6.4386 3.75451 7.00002 3.752C7.56111 3.75451 8.12658 3.8279 8.65453 3.97435C9.91519 3.11981 10.4691 3.29732 10.4691 3.29732C10.8286 4.207 10.6025 4.87889 10.5339 5.04514C10.9574 5.50779 11.2137 6.097 11.2137 6.8181C11.2137 9.35495 9.66855 9.91342 8.19778 10.077C8.4348 10.282 8.64589 10.6841 8.64589 11.3002C8.64589 12.1839 8.63824 12.8952 8.63824 13.1127C8.63824 13.2885 8.75724 13.4945 9.09192 13.4296C11.7147 12.5553 13.6051 10.0803 13.6051 7.16307C13.605 3.51531 10.6477 0.558136 7.00002 0.558136Z" fill="#222227" fill-opacity="0.29"/>
@@ -379,7 +485,7 @@
         </defs>
       </svg>
     </a>
-    <a href="https://discord.gg/CPpB8H6SJr" target="_blank" rel="noopener noreferrer">
+    <a class="icon" href="https://discord.gg/CPpB8H6SJr" target="_blank" rel="noopener noreferrer">
       <svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" width="14" height="14" viewBox="0 0 512 512">
         <defs>
           <mask id="cutout">
@@ -396,20 +502,20 @@
   </div>
 </div>
 <div class="footer future">ROADMAP:<br>
-  - SELF-CONTAINED, EVOLVING AI<br>
-  - DATA, OBJECTIVE, PROJECT MANAGEMENT<br>
+  - SELF-CONTAINED, EVOLVING AI BOTS<br>
+  - ASSET & LIABILITY MANAGEMENT<br>
   - PERSONAL DEVELOPMENT<br>
   - MAPPING EMBEDDING SPACE FOR PATTERNS OF AVOIDANCE<br>
   - PUBLIC AI<br>
   - COMPLETING HUMAN KNOWLEDGE
 </div>
 
-<div class="tooltip">
-  <div class="tooltip-arrow"></div>
-  <div class="tooltip-wrap">
-
+<dialog id="feature-dialog">
+  <div class="feature-dialog-wrap">
+    <span class="feature-dialog-title">TITLE</span>
+    <span class="feature-dialog-description">DESCRIPTION</span>
   </div>
-</div>
+</dialog>
 
 <dialog id="waitlist-dialog">
   <form id="wait-wrap">
@@ -428,15 +534,15 @@
     </div>
     <div class="flex row">
       <label for="suggestions">WHAT CAN AI<br>DO FOR YOU? </label>
-      <textarea type="text" id="suggestions" name="suggestions" maxlength="300" placeholder="If it could..."></textarea>
+      <textarea type="text" id="suggestions" name="suggestions" maxlength="300" placeholder="Can it ..."></textarea>
     </div>
     <button type="submit" class="small-button">
       JOIN
     </button>
   </form>
   <div class="completion">
-    <div>THANK YOU FOR JOINING THE WAITLIST</div>
-    <div>WE WILL NOTIFY YOU WHEN WE ARE READY</div>
+    <span>THANK YOU FOR JOINING THE WAITLIST</span>
+    <span>WE WILL NOTIFY YOU WHEN WE ARE READY</span>
   </div>
 </dialog>
 
@@ -453,6 +559,24 @@
   const cols = Math.ceil(width / segmentLength); // Number of columns per row
   const color1 = "#d9dbe2"; // First row color
   const color2 = "#e9e9e9"; // Alternating row color
+
+  let coloredPieces = 0
+
+  const featureDescriptions = {
+    'OS MODEL': '<strong class="blue">Model wrapping</strong> is the process of taking an <strong class="green">open-source</strong> <strong class="blue">AI model</strong> from <strong class="orange">HuggingFace</strong> and adding essential features like chat interfaces, APIs, <strong class="green">long-term</strong> <strong class="blue">memory</strong>, function calling, and multimodal capabilities to make it fully interactive.<br><br>Services like <strong class="red">ChatGPT</strong> and <strong class="red">Claude</strong> wrap their <strong class="blue">core models</strong> with these features, turning them into <strong>full AI assistants</strong>, while <strong class="green">open-source</strong> models like <strong class="orange">LLaMA</strong>, <strong class="orange">Mixtral</strong>, or <strong class="orange">Phi</strong> require external infrastructure to achieve the same functionality.<br><br><strong class="green">Go-Wrap</strong> provides this infrastructure, enabling any <strong class="green">open-source</strong> <strong class="blue">model</strong> <strong>to match the capabilities of <strong class="red">proprietary</strong> AI assistants</strong> while maintaining full control over data, customization, and transfer learning.<br><br>By managing versioning and continuous <strong class="green">fine-tuning</strong>, <strong class="green">Go-Wrap</strong> ensures <strong class="blue">model</strong> <strong class="red">evolution</strong> is <strong class="blue">maintained</strong> through <strong class="green">long-term</strong> <strong class="red">care</strong>, making <strong class="green">open-source</strong> <strong class="blue">AI</strong> <strong class="green">feature-complete</strong>, <strong class="green">self-improving</strong> and <strong class="blue">reliably yours</strong>.',
+    'SERVERLESS CHAT API': 'A chat API for interacting with any bots you create. Uses modal.com for serverless AI infrastructure.',
+    'CHAT INTERFACE': 'We provide a conversational chat interface for interacting with any bots you create.',
+    'FUNCTION CALLING': 'Give your model function calling capabilities to interact with the world. Write your own plugins.',
+    'LONG TERM MEMORY': 'The model knows what it knows. It can remember things over time.',
+    'LOGS': 'Record events and messages for tracking, debugging, insights, and future distillation.',
+    'SELF-MANAGED DATABASES': 'The model can manage its own vector and relational databases. Users may review and edit.',
+    'SELF-REFINING CAPABILITIES': 'With help from user feedback, the model reaches for truth and grows.',
+    'TRANSFER LEARNING': 'Review the transfer learning process. Setup timers. Check vesion history. Perform evals.',
+    'OBJECTIVE GUIDANCE': 'Models are trained to identify user learning objectives and guide them towards them while solving distraction trajectories.',
+    'PROJECTS ASSIGNMENTS': 'Models are trained in managing projects, assignments, assets and liabilities. They can help you manage your life.',
+    'AGENTIC CHANNELS': 'Multiple AIs with different tasks and personality can interact together in a shared environment.',
+    'DISCORD SUPPORT': 'Get help and interact with the community directly on Discord.'
+  }
 
   function getRandomStarColor() {
     // Define the temperature range excluding blue stars (2500K - 7500K)
@@ -529,10 +653,55 @@
   }
 
   function featureClick(e) {
-    console.log('e.target', e.target.innerText.replace('\n', ' '))
-    const newColor = getRandomStarColor()
-    console.log('newColor', newColor)
-    e.target.style.backgroundColor = newColor
+    const feature = e.target.innerText.replace('\n', ' ')
+    console.log('feature', feature)
+
+    // open the feature-dialog and set the title and description
+    const dialog = document.getElementById('feature-dialog')
+    dialog.showModal()
+    dialog.querySelector('.feature-dialog-title').innerText = feature
+    dialog.querySelector('.feature-dialog-description').innerText = featureDescriptions[feature]
+
+    if (feature === 'OS MODEL')  {
+      dialog.querySelector('.feature-dialog-title').innerHTML = 'WHAT IS <strong class="blue">MODEL WRAPPING</strong>?'
+      dialog.querySelector('.feature-dialog-description').innerHTML = featureDescriptions[feature]
+      // give it model-wrapping-dialog-wrap
+      dialog.querySelector('.feature-dialog-wrap').classList.add('model-wrapping-dialog-wrap')
+      // give the parent .model-wrapping-dialog
+      dialog.classList.add('model-wrapping-dialog')
+    } else {
+      // make sure it does not have model-wrapping-dialog-wrap
+      dialog.querySelector('.feature-dialog-wrap').classList.remove('model-wrapping-dialog-wrap')
+      // make sure the parent does not have .model-wrapping-dialog
+      dialog.classList.remove('model-wrapping-dialog')
+    }
+
+    // const newColor = getRandomStarColor()
+    // if the background color was white, make it mint:
+    //
+    // check if it was white:
+    const currentColor = e.target.style.backgroundColor
+    if (!currentColor) {
+      const newColor = 'rgb(223, 255, 225)'
+      e.target.style.backgroundColor = newColor
+      coloredPieces++
+    } else if (currentColor === 'rgb(223, 255, 225)') {
+      const newColor = 'rgb(250, 234, 214)'
+      e.target.style.backgroundColor = newColor
+    } else if (currentColor === 'rgb(250, 234, 214)') {
+      const newColor = 'rgb(255, 222, 231)'
+      e.target.style.backgroundColor = newColor
+    } else if (currentColor === 'rgb(255, 222, 231)') {
+      const newColor = ''
+      e.target.style.backgroundColor = newColor
+      coloredPieces--
+    }
+    if (coloredPieces === 13) {
+      // give the rainbow-text class
+      document.getElementById('rainbow-text').classList.add('rainbow-text')
+    } else {
+      document.getElementById('rainbow-text').classList.remove('rainbow-text')
+    }
   }
 
   document.getElementById('wait-wrap').addEventListener('submit', async (e) => {
@@ -575,18 +744,22 @@
     document.querySelector('.completion').style.display = 'flex'
 
     console.log('submitted')
+    e.target.reset()
   })
 
+  // attach close event to the dialogs
   const waitlistDialog = document.getElementById('waitlist-dialog')
-  waitlistDialog.addEventListener('click', closeWaitlistDialog)
+  waitlistDialog.addEventListener('click', closeDialog)
+  const featureDialog = document.getElementById('feature-dialog')
+  featureDialog.addEventListener('click', closeDialog)
 
   function showWaitlistDialog() {
     document.getElementById('waitlist-dialog').showModal()
   }
 
-  function closeWaitlistDialog(e) {
-    if (e.target.id === 'waitlist-dialog') {
-      waitlistDialog.close()
+  function closeDialog(e) {
+    if (e.target.nodeName === 'DIALOG') {
+      e.target.close()
     }
   }
 
@@ -655,7 +828,7 @@
       if (points[points.length - 1].x < window.innerWidth + segmentLength) {
         createNew = true
       }
-      if (points[0].x < -segmentLength * 6) {
+      if (points[0].x < -segmentLength * 20) {
         removeFront = true
       }
     }
@@ -786,6 +959,16 @@
 
   // generateZigzagPattern();
   // loadFromSnapshot()
+
+  document.addEventListener("keydown", function (event) {
+    if (event.metaKey && event.key.toLowerCase() === "e") {
+      event.preventDefault(); // Prevent default browser behavior if needed
+      console.log("Meta + E was pressed!");
+      // Add your custom action here
+      generateZigzagPattern();
+      requestAnimationFrame(loop)
+    }
+  });
 
   function copyToClipboard(text) {
     navigator.clipboard.writeText(text)
