@@ -109,7 +109,7 @@
       flex-direction: row;
       justify-content: space-between;
       width: 640px;
-      padding: 8px 7px;
+      padding: 7px 7px;
       box-sizing: border-box;
     }
     .title {
@@ -609,11 +609,13 @@
     //
     // }
     const tap = new Audio('tap.wav')
+    // tap.volume = 0.5;
     tap.play()
   }))
   // select all dialogs, and on close, play 'swipe+place.wav'
   document.querySelectorAll('dialog').forEach(el => el.addEventListener('close', () => {
     const swipe = new Audio('swipe+place.wav')
+    // swipe.volume = 0.5;
     swipe.play()
     disableHoverSound = true
     setTimeout(() => {
@@ -629,6 +631,7 @@
       // check if the element is disabled
       // if (el.hasAttribute('disabled')) return
       const moveBlock = new Audio('bloop.wav')
+      // moveBlock.volume = 0.5;
       moveBlock.play()
     }, 0)
   }))
