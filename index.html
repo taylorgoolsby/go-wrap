@@ -158,6 +158,7 @@
 
       span {
         opacity: 0.60;
+        pointer-events: none;
       }
     }
     button:hover:not([disabled]) {
@@ -172,6 +173,7 @@
     button[disabled] {
       opacity: 0.5;
       cursor: default;
+      pointer-events: none;
     }
     /*.sub-button {*/
     /*  background-color: rgb(0, 2, 0);*/
@@ -247,7 +249,7 @@
       }
     }
     .model-wrapping-dialog {
-      margin-top: 296px;
+      margin-top: 297px;
     }
     .model-wrapping-dialog-wrap.model-wrapping-dialog-wrap.model-wrapping-dialog-wrap {
       margin-top: 0;
@@ -345,7 +347,6 @@
     }
     a.icon {
       line-height: 0;
-      margin-bottom: 1px;
 
       svg {
         pointer-events: none;
@@ -355,6 +356,27 @@
       svg {
         path,circle {
           fill-opacity: 1;
+        }
+      }
+    }
+    a.heart:hover {
+      svg {
+        path {
+          fill: rgba(255, 121, 157, 0.9);
+        }
+      }
+    }
+    a.github:hover {
+      svg {
+        path {
+          fill: rgba(34, 34, 39, 0.90);
+        }
+      }
+    }
+    a.discord:hover {
+      svg {
+        circle {
+          fill: rgba(109, 105, 255, 0.9);
         }
       }
     }
@@ -476,6 +498,9 @@
 <div class="socials">
   <div class="footer"><a class="handle" href="https://x.com/tay2win" target="_blank" rel="noopener noreferrer">@taylorgoolsby</a></div>
   <div class="flex row">
+    <a href="https://www.patreon.com/c/taylorgoolsby/membership" target="_blank" rel="noopener noreferrer" class="icon heart" style="margin-right: 16px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"><path d="M12 4.435c-1.989-5.399-12-4.597-12 3.568 0 4.068 3.06 9.481 12 14.997 8.94-5.516 12-10.929 12-14.997 0-8.118-10-8.999-12-3.568z" fill="#222227" fill-opacity="0.29"/></svg>
+    </a>
     <a class="icon" href="https://github.com/taylorgoolsby/go-wrap" target="_blank" rel="noopener noreferrer" style="margin-right: 16px;">
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g clip-path="url(#clip0_4_13)">
@@ -489,7 +514,7 @@
         </defs>
       </svg>
     </a>
-    <a class="icon" href="https://discord.gg/CPpB8H6SJr" target="_blank" rel="noopener noreferrer">
+    <a class="icon discord" href="https://discord.gg/CPpB8H6SJr" target="_blank" rel="noopener noreferrer">
       <svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" width="14" height="14" viewBox="0 0 512 512">
         <defs>
           <mask id="cutout">
@@ -506,7 +531,7 @@
   </div>
 </div>
 <div class="footer future">ROADMAP:<br>
-  - SELF-CONTAINED, EVOLVING AI BOTS<br>
+  - SELF-CONTAINED, EVOLVING AI<br>
   - ASSET & LIABILITY MANAGEMENT<br>
   - PERSONAL DEVELOPMENT<br>
   - MAPPING EMBEDDING SPACE FOR PATTERNS OF AVOIDANCE<br>
@@ -602,14 +627,14 @@
     setTimeout(() => {
       if (disableHoverSound) return
       // check if the element is disabled
-      if (el.hasAttribute('disabled')) return
+      // if (el.hasAttribute('disabled')) return
       const moveBlock = new Audio('bloop.wav')
       moveBlock.play()
     }, 0)
   }))
 
   const featureDescriptions = {
-    'OS MODEL': '<strong class="blue">Model wrapping</strong> is the process of taking an <strong class="green">open-source</strong> <strong class="blue">AI model</strong> from <strong class="orange">HuggingFace</strong> and adding essential features like chat interfaces, APIs, <strong class="green">long-term</strong> <strong class="blue">memory</strong>, function calling, and multimodal capabilities to make it fully interactive.<br><br>Services like <strong class="red">ChatGPT</strong> and <strong class="red">Claude</strong> wrap their <strong class="blue">core models</strong> with these features, turning them into <strong>full AI assistants</strong>, while <strong class="green">open-source</strong> <strong class="orange">models</strong> like <strong class="orange">LLaMA</strong>, <strong class="orange">Mixtral</strong>, or <strong class="orange">Phi</strong> require external infrastructure to achieve the same functionality.<br><br><strong class="green">Go-Wrap</strong> provides this infrastructure, enabling any <strong class="green">open-source</strong> <strong class="blue">model</strong> <strong>to match the capabilities of <strong class="red">proprietary</strong> AI assistants</strong> while maintaining full control over data, customization, and transfer learning.<br><br>By managing versioning and continuous <strong class="green">fine-tuning</strong>, <strong class="green">Go-Wrap</strong> ensures <strong class="blue">model</strong> <strong class="red">evolution</strong> is <strong class="blue">maintained</strong> through <strong class="green">long-term</strong> <strong class="red">care</strong>, making <strong class="green">open-source</strong> <strong class="blue">AI</strong> <strong class="green">feature-complete</strong>, <strong class="green">self-improving</strong> and <strong class="blue">reliably yours</strong>.',
+    'OS MODEL': '<strong class="blue">Model wrapping</strong> is the process of taking an <strong class="green">open-source</strong> <strong class="blue">AI model</strong> from <strong class="orange">HuggingFace</strong> and adding essential features like chat interfaces, APIs, <strong class="green">long-term</strong> <strong class="blue">memory</strong>, function calling, and multimodal capabilities to make it fully interactive.<br><br><strong class="red">Services</strong> like <strong class="red">ChatGPT</strong> and <strong class="red">Claude</strong> wrap their <strong class="blue">core models</strong> with these features, turning them into <strong>full AI assistants</strong>, while <strong class="green">open-source</strong> <strong class="orange">models</strong> like <strong class="orange">LLaMA</strong>, <strong class="orange">Mixtral</strong>, or <strong class="orange">Phi</strong> require external infrastructure to achieve the same functionality.<br><br><strong class="green">Go-Wrap</strong> provides this infrastructure, enabling any <strong class="green">open-source</strong> <strong class="blue">model</strong> <strong>to match the capabilities of <strong class="red">proprietary</strong> AI assistants</strong> while maintaining full control over data, customization, and transfer learning.<br><br><strong class="green">By</strong> managing versioning and continuous <strong class="green">fine-tuning</strong>, <strong class="green">Go-Wrap</strong> ensures <strong class="blue">model</strong> <strong class="red">evolution</strong> is <strong class="blue">maintained</strong> through <strong class="green">long-term</strong> <strong class="red">care</strong>, making <strong class="green">open-source</strong> <strong class="blue">AI</strong> <strong class="green">feature-complete</strong>, <strong class="green">self-improving</strong> and <strong class="blue">reliably yours</strong>.',
     'SERVERLESS CHAT API': 'A chat API for interacting with any bots you create. Uses modal.com for serverless AI infrastructure.',
     'CHAT INTERFACE': 'We provide a conversational chat interface for interacting with any bots you create.',
     'FUNCTION CALLING': 'Give your model function calling capabilities to interact with the world. Write your own plugins.',
@@ -779,6 +804,7 @@
             first_name: values.firstName,
             last_name: values.lastName,
             suggestions: values.suggestions,
+            coloredPieces
           }
         }),
       }
