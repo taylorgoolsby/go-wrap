@@ -562,6 +562,10 @@
       <input type="email" id="email" name="email" required/>
     </div>
     <div class="flex row">
+      <label for="website">COMPANY WEBSITE: </label>
+      <input type="text" id="website" name="website"/>
+    </div>
+    <div class="flex row">
       <label for="suggestions">WHAT CAN AI<br>DO FOR YOU? </label>
       <textarea type="text" id="suggestions" name="suggestions" maxlength="300" placeholder="Can it ..."></textarea>
     </div>
@@ -807,6 +811,7 @@
             first_name: values.firstName,
             last_name: values.lastName,
             suggestions: values.suggestions,
+            website: values.website,
             coloredPieces
           }
         }),
@@ -1054,6 +1059,7 @@
   function reveal() {
     if (!revealed) {
       revealed = true
+      lastTime = performance.now();
       generateZigzagPattern();
       requestAnimationFrame(loop)
     }
