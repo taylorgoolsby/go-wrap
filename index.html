@@ -68,6 +68,8 @@
       left: 0;
       right: 0;
       bottom: 0;
+      width: 100vw;
+      height: 100vh;
       z-index: 0;
     }
     #tint {
@@ -1179,14 +1181,14 @@
     }
   }
 
-  document.addEventListener("keydown", function (event) {
-    if (event.metaKey && event.key.toLowerCase() === "e") {
-      event.preventDefault(); // Prevent default browser behavior if needed
-      console.log("Meta + E was pressed!");
-      // Add your custom action here
-      reveal()
-    }
-  });
+  // document.addEventListener("keydown", function (event) {
+  //   if (event.metaKey && event.key.toLowerCase() === "e") {
+  //     event.preventDefault(); // Prevent default browser behavior if needed
+  //     console.log("Meta + E was pressed!");
+  //     // Add your custom action here
+  //     reveal()
+  //   }
+  // });
 
   function copyToClipboard(text) {
     navigator.clipboard.writeText(text)
@@ -1201,6 +1203,89 @@
   //   console.log(JSON.stringify(lines, null, '  '))
   //   copyToClipboard(JSON.stringify(lines, null, '  '));
   // }, 1000 * 60)
+
+  let gameMode = false
+  let playerIndex = 1
+  let table
+  window.addEventListener('keydown', (e) => {
+    // check for e+meta key press:
+    if (e.metaKey && e.key === 'e') {
+      // enter game mode
+      gameMode = true
+
+      // initialize board:
+      // get the table by class:
+      table = document.querySelector('.table')
+      // set divs to all green:
+      table.querySelectorAll('div').forEach(div => {
+        div.style.backgroundColor = 'rgb(223, 255, 225)'
+      })
+
+      // set player to red, the 2nd child
+      table.children[playerIndex].style.backgroundColor = 'rgb(255, 222, 231)'
+    }
+
+    // check for arrow key presses:
+    if (e.key === 'ArrowUp') {
+      // move the player up
+      if (gameMode) {
+        // set the current player to green
+        table.children[playerIndex].style.backgroundColor = 'rgb(223, 255, 225)'
+        // move the player 'up'
+        playerIndex -= 4
+        if (playerIndex < 0) {
+          playerIndex += 4
+        }
+        // set the new player to red
+        table.children[playerIndex].style.backgroundColor = 'rgb(255, 222, 231)'
+      }
+    } else if (e.key === 'ArrowDown') {
+      // move the player down
+      if (gameMode) {
+        // set the current player to green
+        table.children[playerIndex].style.backgroundColor = 'rgb(223, 255, 225)'
+        // move the player 'down'
+        playerIndex += 4
+        if (playerIndex > 11) {
+          playerIndex -= 4
+        }
+        // set the new player to red
+        table.children[playerIndex].style.backgroundColor = 'rgb(255, 222, 231)'
+      }
+    } else if (e.key === 'ArrowRight') {
+      // move the player right
+      if (gameMode) {
+        // set the current player to green
+        table.children[playerIndex].style.backgroundColor = 'rgb(223, 255, 225)'
+        // move the player 'right'
+        playerIndex += 1
+        // loop back around if player is already on the right edge
+        if (playerIndex % 4 === 0) {
+          playerIndex -= 4
+        }
+        // set the new player to red
+        table.children[playerIndex].style.backgroundColor = 'rgb(255, 222, 231)'
+      }
+    } else if (e.key === 'ArrowLeft') {
+      // move the player left
+      if (gameMode) {
+        // set the current player to green
+        table.children[playerIndex].style.backgroundColor = 'rgb(223, 255, 225)'
+        // move the player 'left'
+        playerIndex -= 1
+        if (playerIndex < 0) {
+          playerIndex++
+        }
+        // loop back around if player is already on the left edge
+        if (playerIndex % 4 === 3) {
+          playerIndex += 4
+        }
+        // set the new player to red
+        table.children[playerIndex].style.backgroundColor = 'rgb(255, 222, 231)'
+      }
+    }
+  })
+
 </script>
 
 <script type="application/ld+json">
