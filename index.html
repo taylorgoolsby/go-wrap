@@ -12,6 +12,16 @@
   <meta name="twitter:site" content="@tay2win">
   <meta name="twitter:creator" content="@tay2win">
 
+  <meta property="og:title" content="Go-Wrap – Wrap Any Open-Source AI Model">
+  <meta property="og:description" content="Enhance your AI models with function calling, long-term memory, and more.">
+  <meta property="og:image" content="https://go-wrap.com/go-wrap.png">
+  <meta property="og:url" content="https://go-wrap.com">
+  <meta property="og:type" content="website">
+
+  <meta name="description" content="Go-Wrap helps you wrap any open-source AI model, making it feature-complete with long-term memory, function calling, self-refinement, and more.">
+  <meta name="keywords" content="AI wrapper, open-source AI, AI infrastructure, function calling, memory, model refinement, chat API">
+
+
   <link href="https://fonts.googleapis.com/css2?family=Nova+Mono&family=Sometype+Mono:ital,wght@0,400..700;1,400..700&family=Sono:wght@200..800&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
 
   <style>
@@ -21,13 +31,13 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      height: 100vh;
       font-family: 'Sometype Mono', monospace;
       font-size: 11px;
       color: #222227;
       margin: 0;
       /*margin-top: -100px;*/
       transform: scale(calc(16/11));
+      transform-origin: top;
       overflow: hidden;
     }
     dialog {
@@ -50,8 +60,6 @@
       left: 0;
       right: 0;
       bottom: 0;
-      width: 100vw;
-      height: 100vh;
       z-index: 0;
     }
     #zigzag-svg {
@@ -60,8 +68,6 @@
       left: 0;
       right: 0;
       bottom: 0;
-      width: 100vw;
-      height: 100vh;
       z-index: 0;
     }
     #tint {
@@ -70,8 +76,6 @@
       left: 0;
       right: 0;
       bottom: 0;
-      width: 100vw;
-      height: 100vh;
       z-index: 1;
       background-color: #7a7aff;
       /*background-color: #ffac7a;*/
@@ -84,8 +88,6 @@
       left: 0;
       right: 0;
       bottom: 0;
-      width: 100vw;
-      height: 100vh;
       z-index: 1;
       /*background-color: #7a7aff;*/
       /*background: linear-gradient(45deg, rgba(255, 255, 255, 0.2), rgba(0, 100, 255, 0.2));*/
@@ -96,6 +98,11 @@
     }
     *:not(#zigzag-svg) {
       z-index: 2;
+    }
+    h1, h2 {
+      margin: 0;
+      font-size: 11px;
+      font-weight: normal;
     }
     .container {
       display: flex;
@@ -115,7 +122,7 @@
       display: flex;
       flex-direction: row;
       justify-content: space-between;
-      width: 640px;
+      align-self: stretch;
       padding: 7px 7px;
       box-sizing: border-box;
     }
@@ -128,28 +135,71 @@
       display: inline-block;
       margin-bottom: 7px;
     }
-    table {
+
+    .table {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(3, auto);
       border-collapse: collapse; /* Ensures no spacing between borders */
     }
-    td, th {
-      padding: 0; /* Removes padding inside cells */
-    }
-    td {
+    /*td, th {*/
+    /*  padding: 0; !* Removes padding inside cells *!*/
+    /*}*/
+    .td {
+      display: flex;
+      justify-content: center;
+      align-items: center;
       width: 108px;
       height: 54px;
       box-sizing: border-box;
       cursor: pointer;
       transition: opacity 80ms steps(1, end);
     }
-    td:hover {
+    .td:hover {
       /*background-color: #7a7aff30;*/
       background-color: rgba(197, 212, 255, 0.3);
     }
+
     .buttons {
       display: flex;
       align-self: stretch;
       justify-content: space-evenly;
     }
+
+    .subtitle {
+      display: flex;
+      flex-direction: row;
+      white-space: pre;
+
+      h2:first-of-type::after {
+        content: " ";
+      }
+    }
+
+    .page {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: calc(100vh * 11 / 16);
+      width: calc(100vw * 11 / 16);
+      overflow: hidden;
+      justify-content: center;
+    }
+    .container-socials-wrap {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .footer {
+      font-size: 11px;
+    }
+    .future {
+      opacity: 0.29;
+      margin-top: 50px;
+      margin-left: 0;
+      margin-bottom: 0px;
+    }
+
     button {
       /*padding: 12px 0;*/
       width: 162px;
@@ -194,14 +244,6 @@
     /*  border-color: rgb(0, 2, 0);*/
     /*  opacity: 1;*/
     /*}*/
-    .footer {
-      font-size: 11px;
-    }
-    .future {
-      opacity: 0.29;
-      margin-top: 50px;
-      margin-left: 5px;
-    }
     ul {
       margin: 0
     }
@@ -348,6 +390,7 @@
     }
     a.handle {
       opacity: 0.29;
+      color: #222227;
     }
     a.handle:hover {
       opacity: 1;
@@ -427,6 +470,59 @@
       animation: rainbowScroll 3s linear infinite; /* Adjust speed by changing 3s */
     }
 
+    @media (max-width: 768px) {
+      body {
+        height: unset;
+        overflow: unset;
+        transform: unset;
+        /*width: 100vw;*/
+      }
+
+      dialog {
+        transform: unset;
+
+        > * {
+          max-width: 242px;
+        }
+      }
+
+      .container {
+        margin-top: 30px;
+        width: 244px;
+        height: 940px;
+      }
+
+      .table {
+        grid-template-columns: repeat(1, 1fr);
+        grid-template-rows: repeat(12, auto);
+      }
+
+      .subtitle {
+        flex-direction: column;
+
+        h2:first-of-type::after {
+          content: "";
+        }
+      }
+
+      .buttons {
+        flex-direction: column;
+        align-items: center;
+
+        *:first-child {
+          margin-bottom: 32px;
+        }
+      }
+
+      .future {
+        margin-bottom: 30px;
+      }
+
+      input, textarea {
+        width: 106px;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -437,106 +533,115 @@
   <div id="gradient"></div>
 </div>
 
-<div class="container">
-  <div>WELCOME TO GO-WRAP</div>
-  <div>WRAP ANY <a class="model-wrapping-link" onclick="featureClick(event)">OS MODEL</a>. MAKE IT <span id="rainbow-text">FEATURE COMPLETE</span>.</div>
-  <table>
-    <tr>
-      <td onclick="featureClick(event)">
-        SERVERLESS<br>CHAT API
-      </td>
-      <td onclick="featureClick(event)">
-        CHAT<br>INTERFACE
-      </td>
-      <td onclick="featureClick(event)">
-        FUNCTION<br>CALLING
-      </td>
-      <td onclick="featureClick(event)">
-        LONG TERM<br>MEMORY
-      </td>
-    </tr>
-    <tr>
-      <td onclick="featureClick(event)">
-        LOGS
-      </td>
-      <td onclick="featureClick(event)">
-        SELF-MANAGED<br>DATABASES
-      </td>
-      <td onclick="featureClick(event)">
-        SELF-REFINING<br>CAPABILITIES
-      </td>
-      <td onclick="featureClick(event)">
-        TRANSFER<br>LEARNING
-      </td>
-    </tr>
-    <tr>
-      <td onclick="featureClick(event)">
-        OBJECTIVE<br>GUIDANCE
-      </td>
-      <td onclick="featureClick(event)">
-        PROJECTS<br>ASSIGNMENTS
-      </td>
-      <td onclick="featureClick(event)">
-        AGENTIC<br>CHANNELS
-      </td>
-      <td onclick="featureClick(event)">
-        DISCORD<br>SUPPORT
-      </td>
-    </tr>
-  </table>
-<!--  <ul class="feature-list">-->
-<!--    <li>CLOUD-HOSTED SERVERLESS CHAT API</li>-->
-<!--    <li>CUSTOMIZABLE SYSTEM PROMPT</li>-->
-<!--    <li>FUNCTION CALLING</li>-->
-<!--    <li>VECTOR/RELATIONAL DATABASES</li>-->
-<!--    <li>LOGS</li>-->
-<!--    <li>LONG TERM MEMORY</li>-->
-<!--    <li>SELF-REFINING CAPABILITIES</li>-->
-<!--    <li>CLOUD-HOSTED PERIODIC TRANSFER LEARNING</li>-->
-<!--    <li>OBJECTIVE IDENTIFICATION AND GUIDANCE</li>-->
-<!--    <li>PROJECT AND ASSIGNMENT MANAGER</li>-->
-<!--    <li>DISCORD SUPPORT</li>-->
-<!--  </ul>-->
-  <div class="buttons">
-    <button onclick="window.showWaitlistDialog()"><span>WAIT</span></button>
-    <button disabled class="sub-button"><span>SUB $20/MO</span></button>
-  </div>
-</div>
-<div class="socials">
-  <div class="footer"><a class="handle" href="https://x.com/tay2win" target="_blank" rel="noopener noreferrer">@taylorgoolsby</a></div>
-  <div class="flex row">
-    <a href="https://www.patreon.com/c/taylorgoolsby/membership" target="_blank" rel="noopener noreferrer" class="icon heart" style="margin-right: 16px;">
-      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"><path d="M12 4.435c-1.989-5.399-12-4.597-12 3.568 0 4.068 3.06 9.481 12 14.997 8.94-5.516 12-10.929 12-14.997 0-8.118-10-8.999-12-3.568z" fill="#222227" fill-opacity="0.29"/></svg>
-    </a>
-    <a class="icon" href="https://github.com/taylorgoolsby/go-wrap" target="_blank" rel="noopener noreferrer" style="margin-right: 16px;">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <g clip-path="url(#clip0_4_13)">
-          <path fill-rule="evenodd" clip-rule="evenodd" d="M7.00002 0.558136C3.35269 0.558136 0.395081 3.51509 0.395081 7.16307C0.395081 10.0814 2.2876 12.5571 4.91194 13.4306C5.24192 13.4918 5.36311 13.2873 5.36311 13.1129C5.36311 12.9554 5.35699 12.4351 5.35414 11.8832C3.51664 12.2827 3.12891 11.1039 3.12891 11.1039C2.82846 10.3404 2.39555 10.1374 2.39555 10.1374C1.79617 9.72748 2.44072 9.73601 2.44072 9.73601C3.10386 9.7825 3.45321 10.4167 3.45321 10.4167C4.0423 11.4262 4.99835 11.1344 5.37525 10.9657C5.43453 10.5388 5.60571 10.2473 5.7946 10.0824C4.32755 9.9156 2.78525 9.34915 2.78525 6.81832C2.78525 6.09721 3.04338 5.50801 3.46589 5.04535C3.39721 4.8791 3.17113 4.20732 3.52977 3.29754C3.52977 3.29754 4.0843 3.12003 5.34649 3.97457C5.87346 3.82812 6.4386 3.75451 7.00002 3.752C7.56111 3.75451 8.12658 3.8279 8.65453 3.97435C9.91519 3.11981 10.4691 3.29732 10.4691 3.29732C10.8286 4.207 10.6025 4.87889 10.5339 5.04514C10.9574 5.50779 11.2137 6.097 11.2137 6.8181C11.2137 9.35495 9.66855 9.91342 8.19778 10.077C8.4348 10.282 8.64589 10.6841 8.64589 11.3002C8.64589 12.1839 8.63824 12.8952 8.63824 13.1127C8.63824 13.2885 8.75724 13.4945 9.09192 13.4296C11.7147 12.5553 13.6051 10.0803 13.6051 7.16307C13.605 3.51531 10.6477 0.558136 7.00002 0.558136Z" fill="#222227" fill-opacity="0.29"/>
-          <path d="M2.89673 10.0413C2.88219 10.0741 2.83056 10.0839 2.78353 10.0615C2.73541 10.04 2.70861 9.99531 2.72414 9.96239C2.73836 9.92848 2.79009 9.91919 2.83789 9.94183C2.88602 9.96338 2.91336 10.0085 2.89662 10.0414L2.89673 10.0413ZM3.16427 10.3397C3.13287 10.3689 3.0713 10.3554 3.02952 10.3091C2.9862 10.2632 2.97811 10.2016 3.01016 10.172C3.04275 10.1429 3.10247 10.1566 3.14578 10.2026C3.18887 10.2492 3.19741 10.3102 3.16437 10.3398L3.16427 10.3397ZM3.4248 10.72C3.38433 10.7483 3.31805 10.7219 3.27714 10.6632C3.23667 10.6043 3.23667 10.5338 3.27823 10.5057C3.31903 10.4774 3.38433 10.5029 3.42589 10.5611C3.46614 10.6207 3.46614 10.6914 3.4248 10.72ZM3.78147 11.0876C3.74537 11.1276 3.66816 11.1168 3.61172 11.0625C3.55408 11.0092 3.538 10.9334 3.5742 10.8936C3.61095 10.8536 3.6885 10.8647 3.74527 10.9188C3.80291 10.9719 3.8203 11.0478 3.78169 11.0875L3.78147 11.0876ZM4.27366 11.301C4.25758 11.3528 4.18342 11.3763 4.1085 11.3542C4.0338 11.3315 3.98491 11.2711 4.00022 11.2188C4.01553 11.1666 4.09023 11.1422 4.16559 11.1657C4.2403 11.1883 4.28919 11.2484 4.27366 11.301ZM4.8143 11.3405C4.81616 11.395 4.75272 11.44 4.6743 11.4411C4.59522 11.443 4.53123 11.3988 4.53047 11.3452C4.53047 11.2902 4.59259 11.2457 4.67156 11.2442C4.74998 11.2427 4.81441 11.2865 4.81441 11.3404L4.8143 11.3405ZM5.3172 11.255C5.32661 11.308 5.27203 11.3626 5.19405 11.3772C5.11748 11.3914 5.04639 11.3583 5.03655 11.3057C5.02714 11.2513 5.0827 11.1967 5.15926 11.1826C5.23736 11.1691 5.30736 11.2011 5.3172 11.255Z" fill="#222227" fill-opacity="0.29"/>
-        </g>
-        <defs>
-          <clipPath id="clip0_4_13">
-            <rect width="14" height="14" fill="white"/>
-          </clipPath>
-        </defs>
-      </svg>
-    </a>
-    <a class="icon discord" href="https://discord.gg/CPpB8H6SJr" target="_blank" rel="noopener noreferrer">
-      <svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" width="14" height="14" viewBox="0 0 512 512">
-        <defs>
-          <mask id="cutout">
-            <!-- White fills will become visible areas, black areas will be cut out -->
-            <rect width="512" height="512" fill="white"/>
-            <path fill="black" fill-rule="nonzero" d="M360.932 160.621a250.49 250.49 0 00-62.384-19.182 174.005 174.005 0 00-7.966 16.243 232.677 232.677 0 00-34.618-2.602c-11.569 0-23.196.879-34.623 2.58-2.334-5.509-5.044-10.972-7.986-16.223a252.55 252.55 0 00-62.397 19.222c-39.483 58.408-50.183 115.357-44.833 171.497a251.546 251.546 0 0076.502 38.398c6.169-8.328 11.695-17.193 16.386-26.418a161.718 161.718 0 01-25.813-12.318c2.165-1.569 4.281-3.186 6.325-4.756 23.912 11.23 50.039 17.088 76.473 17.088 26.436 0 52.563-5.858 76.475-17.09 2.069 1.689 4.186 3.306 6.325 4.756a162.642 162.642 0 01-25.859 12.352 183.919 183.919 0 0016.386 26.396 250.495 250.495 0 0076.553-38.391l-.006.006c6.278-65.103-10.724-121.529-44.94-171.558zM205.779 297.63c-14.908 0-27.226-13.53-27.226-30.174 0-16.645 11.889-30.294 27.179-30.294 15.289 0 27.511 13.649 27.249 30.294-.261 16.644-12.007 30.174-27.202 30.174zm100.439 0c-14.933 0-27.202-13.53-27.202-30.174 0-16.645 11.889-30.294 27.202-30.294 15.313 0 27.44 13.649 27.178 30.294-.261 16.644-11.984 30.174-27.178 30.174z"/>
-          </mask>
-        </defs>
+<div class="page">
+  <div class="container-socials-wrap">
+    <div class="container">
+      <h1>WELCOME TO GO-WRAP</h1>
+      <div class="subtitle">
+        <h2>WRAP ANY <a class="model-wrapping-link" onclick="featureClick(event)">OS MODEL</a>.</h2><h2>MAKE IT <span id="rainbow-text">FEATURE COMPLETE</span>.</h2>
+      </div>
+      <div class="table">
+        <div class="td" onclick="featureClick(event)">
+          SERVERLESS<br>CHAT API
+        </div>
+        <div class="td" onclick="featureClick(event)">
+          CHAT<br>INTERFACE
+        </div>
+        <div class="td" onclick="featureClick(event)">
+          FUNCTION<br>CALLING
+        </div>
+        <div class="td" onclick="featureClick(event)">
+          LONG TERM<br>MEMORY
+        </div>
 
-        <!-- Black circle background with a cutout -->
-        <circle cx="256" cy="256" r="256" fill="#222227" fill-opacity="0.29" mask="url(#cutout)"/>
-      </svg>
-    </a>
+        <div class="td" onclick="featureClick(event)">
+          LOGS
+        </div>
+        <div class="td" onclick="featureClick(event)">
+          SELF-MANAGED<br>DATABASES
+        </div>
+        <div class="td" onclick="featureClick(event)">
+          SELF-REFINING<br>CAPABILITIES
+        </div>
+        <div class="td" onclick="featureClick(event)">
+          TRANSFER<br>LEARNING
+        </div>
+
+        <div class="td" onclick="featureClick(event)">
+          OBJECTIVE<br>GUIDANCE
+        </div>
+        <div class="td" onclick="featureClick(event)">
+          PROJECTS<br>ASSIGNMENTS
+        </div>
+        <div class="td" onclick="featureClick(event)">
+          AGENTIC<br>CHANNELS
+        </div>
+        <div class="td" onclick="featureClick(event)">
+          DISCORD<br>SUPPORT
+        </div>
+      </div>
+      <!--  <ul class="feature-list">-->
+      <!--    <li>CLOUD-HOSTED SERVERLESS CHAT API</li>-->
+      <!--    <li>CUSTOMIZABLE SYSTEM PROMPT</li>-->
+      <!--    <li>FUNCTION CALLING</li>-->
+      <!--    <li>VECTOR/RELATIONAL DATABASES</li>-->
+      <!--    <li>LOGS</li>-->
+      <!--    <li>LONG TERM MEMORY</li>-->
+      <!--    <li>SELF-REFINING CAPABILITIES</li>-->
+      <!--    <li>CLOUD-HOSTED PERIODIC TRANSFER LEARNING</li>-->
+      <!--    <li>OBJECTIVE IDENTIFICATION AND GUIDANCE</li>-->
+      <!--    <li>PROJECT AND ASSIGNMENT MANAGER</li>-->
+      <!--    <li>DISCORD SUPPORT</li>-->
+      <!--  </ul>-->
+      <div class="buttons">
+        <button onclick="window.showWaitlistDialog()"><span>WAIT</span></button>
+        <button disabled class="sub-button"><span>SUB $20/MO</span></button>
+      </div>
+    </div>
+    <div class="socials">
+      <div class="footer"><a class="handle" href="https://x.com/tay2win" target="_blank" rel="noopener noreferrer">@taylorgoolsby</a></div>
+      <div class="flex row">
+        <a href="https://www.patreon.com/c/taylorgoolsby/membership" target="_blank" rel="noopener noreferrer" class="icon heart" style="margin-right: 16px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"><path d="M12 4.435c-1.989-5.399-12-4.597-12 3.568 0 4.068 3.06 9.481 12 14.997 8.94-5.516 12-10.929 12-14.997 0-8.118-10-8.999-12-3.568z" fill="#222227" fill-opacity="0.29"/></svg>
+        </a>
+        <a class="icon" href="https://github.com/taylorgoolsby/go-wrap" target="_blank" rel="noopener noreferrer" style="margin-right: 16px;">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g clip-path="url(#clip0_4_13)">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M7.00002 0.558136C3.35269 0.558136 0.395081 3.51509 0.395081 7.16307C0.395081 10.0814 2.2876 12.5571 4.91194 13.4306C5.24192 13.4918 5.36311 13.2873 5.36311 13.1129C5.36311 12.9554 5.35699 12.4351 5.35414 11.8832C3.51664 12.2827 3.12891 11.1039 3.12891 11.1039C2.82846 10.3404 2.39555 10.1374 2.39555 10.1374C1.79617 9.72748 2.44072 9.73601 2.44072 9.73601C3.10386 9.7825 3.45321 10.4167 3.45321 10.4167C4.0423 11.4262 4.99835 11.1344 5.37525 10.9657C5.43453 10.5388 5.60571 10.2473 5.7946 10.0824C4.32755 9.9156 2.78525 9.34915 2.78525 6.81832C2.78525 6.09721 3.04338 5.50801 3.46589 5.04535C3.39721 4.8791 3.17113 4.20732 3.52977 3.29754C3.52977 3.29754 4.0843 3.12003 5.34649 3.97457C5.87346 3.82812 6.4386 3.75451 7.00002 3.752C7.56111 3.75451 8.12658 3.8279 8.65453 3.97435C9.91519 3.11981 10.4691 3.29732 10.4691 3.29732C10.8286 4.207 10.6025 4.87889 10.5339 5.04514C10.9574 5.50779 11.2137 6.097 11.2137 6.8181C11.2137 9.35495 9.66855 9.91342 8.19778 10.077C8.4348 10.282 8.64589 10.6841 8.64589 11.3002C8.64589 12.1839 8.63824 12.8952 8.63824 13.1127C8.63824 13.2885 8.75724 13.4945 9.09192 13.4296C11.7147 12.5553 13.6051 10.0803 13.6051 7.16307C13.605 3.51531 10.6477 0.558136 7.00002 0.558136Z" fill="#222227" fill-opacity="0.29"/>
+              <path d="M2.89673 10.0413C2.88219 10.0741 2.83056 10.0839 2.78353 10.0615C2.73541 10.04 2.70861 9.99531 2.72414 9.96239C2.73836 9.92848 2.79009 9.91919 2.83789 9.94183C2.88602 9.96338 2.91336 10.0085 2.89662 10.0414L2.89673 10.0413ZM3.16427 10.3397C3.13287 10.3689 3.0713 10.3554 3.02952 10.3091C2.9862 10.2632 2.97811 10.2016 3.01016 10.172C3.04275 10.1429 3.10247 10.1566 3.14578 10.2026C3.18887 10.2492 3.19741 10.3102 3.16437 10.3398L3.16427 10.3397ZM3.4248 10.72C3.38433 10.7483 3.31805 10.7219 3.27714 10.6632C3.23667 10.6043 3.23667 10.5338 3.27823 10.5057C3.31903 10.4774 3.38433 10.5029 3.42589 10.5611C3.46614 10.6207 3.46614 10.6914 3.4248 10.72ZM3.78147 11.0876C3.74537 11.1276 3.66816 11.1168 3.61172 11.0625C3.55408 11.0092 3.538 10.9334 3.5742 10.8936C3.61095 10.8536 3.6885 10.8647 3.74527 10.9188C3.80291 10.9719 3.8203 11.0478 3.78169 11.0875L3.78147 11.0876ZM4.27366 11.301C4.25758 11.3528 4.18342 11.3763 4.1085 11.3542C4.0338 11.3315 3.98491 11.2711 4.00022 11.2188C4.01553 11.1666 4.09023 11.1422 4.16559 11.1657C4.2403 11.1883 4.28919 11.2484 4.27366 11.301ZM4.8143 11.3405C4.81616 11.395 4.75272 11.44 4.6743 11.4411C4.59522 11.443 4.53123 11.3988 4.53047 11.3452C4.53047 11.2902 4.59259 11.2457 4.67156 11.2442C4.74998 11.2427 4.81441 11.2865 4.81441 11.3404L4.8143 11.3405ZM5.3172 11.255C5.32661 11.308 5.27203 11.3626 5.19405 11.3772C5.11748 11.3914 5.04639 11.3583 5.03655 11.3057C5.02714 11.2513 5.0827 11.1967 5.15926 11.1826C5.23736 11.1691 5.30736 11.2011 5.3172 11.255Z" fill="#222227" fill-opacity="0.29"/>
+            </g>
+            <defs>
+              <clipPath id="clip0_4_13">
+                <rect width="14" height="14" fill="white"/>
+              </clipPath>
+            </defs>
+          </svg>
+        </a>
+        <a class="icon discord" href="https://discord.gg/CPpB8H6SJr" target="_blank" rel="noopener noreferrer">
+          <svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" width="14" height="14" viewBox="0 0 512 512">
+            <defs>
+              <mask id="cutout">
+                <!-- White fills will become visible areas, black areas will be cut out -->
+                <rect width="512" height="512" fill="white"/>
+                <path fill="black" fill-rule="nonzero" d="M360.932 160.621a250.49 250.49 0 00-62.384-19.182 174.005 174.005 0 00-7.966 16.243 232.677 232.677 0 00-34.618-2.602c-11.569 0-23.196.879-34.623 2.58-2.334-5.509-5.044-10.972-7.986-16.223a252.55 252.55 0 00-62.397 19.222c-39.483 58.408-50.183 115.357-44.833 171.497a251.546 251.546 0 0076.502 38.398c6.169-8.328 11.695-17.193 16.386-26.418a161.718 161.718 0 01-25.813-12.318c2.165-1.569 4.281-3.186 6.325-4.756 23.912 11.23 50.039 17.088 76.473 17.088 26.436 0 52.563-5.858 76.475-17.09 2.069 1.689 4.186 3.306 6.325 4.756a162.642 162.642 0 01-25.859 12.352 183.919 183.919 0 0016.386 26.396 250.495 250.495 0 0076.553-38.391l-.006.006c6.278-65.103-10.724-121.529-44.94-171.558zM205.779 297.63c-14.908 0-27.226-13.53-27.226-30.174 0-16.645 11.889-30.294 27.179-30.294 15.289 0 27.511 13.649 27.249 30.294-.261 16.644-12.007 30.174-27.202 30.174zm100.439 0c-14.933 0-27.202-13.53-27.202-30.174 0-16.645 11.889-30.294 27.202-30.294 15.313 0 27.44 13.649 27.178 30.294-.261 16.644-11.984 30.174-27.178 30.174z"/>
+              </mask>
+            </defs>
+
+            <!-- Black circle background with a cutout -->
+            <circle cx="256" cy="256" r="256" fill="#222227" fill-opacity="0.29" mask="url(#cutout)"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="footer future">DESIGNED FOR:<br>
+    - WRAPPING OPEN-SOURCE MODELS<br>
+    - BUILDING AI KNOWLEDGE BASES<br>
+    - DEVELOPING EVOLVING AI BOTS
   </div>
 </div>
+
+
 <!--<div class="footer future">ROADMAP:<br>-->
 <!--  - SELF-CONTAINED, EVOLVING AI<br>-->
 <!--  - ASSET & LIABILITY MANAGEMENT<br>-->
@@ -545,11 +650,6 @@
 <!--  - PUBLIC AI<br>-->
 <!--  - COMPLETING HUMAN KNOWLEDGE-->
 <!--</div>-->
-<div class="footer future">DESIGNED FOR:<br>
-  - WRAPPING OPEN-SOURCE MODELS<br>
-  - BUILDING AI KNOWLEDGE BASES<br>
-  - DEVELOPING EVOLVING AI BOTS
-</div>
 
 <dialog id="feature-dialog">
   <div class="go-wrap feature-dialog-wrap">
@@ -743,7 +843,8 @@
   }
 
   function featureClick(e) {
-    const feature = e.target.innerText.replace('\n', ' ')
+    console.log('e.target.innerText', e.target.innerText)
+    const feature = e.target.innerText.replace(/\n+/g, ' ')
     console.log('feature', feature)
 
     // open the feature-dialog and set the title and description
@@ -967,19 +1068,19 @@
   let accumulatedTime = 0;
   function loop() {
     requestAnimationFrame(loop)
-    let currentTime = performance.now();
-
-    // Calculate delta time
-    deltaTime = (currentTime - lastTime) / 1000; // Convert ms to seconds
-    lastTime = currentTime;
-
-    // Accumulate time to process fixed steps
-    accumulatedTime += deltaTime;
-
-    while (accumulatedTime >= fixedTimeStep) {
+    // let currentTime = performance.now();
+    //
+    // // Calculate delta time
+    // deltaTime = (currentTime - lastTime) / 1000; // Convert ms to seconds
+    // lastTime = currentTime;
+    //
+    // // Accumulate time to process fixed steps
+    // accumulatedTime += deltaTime;
+    //
+    // while (accumulatedTime >= fixedTimeStep) {
       updateLines(fixedTimeStep) // Fixed-step update
-      accumulatedTime -= fixedTimeStep;
-    }
+    //   accumulatedTime -= fixedTimeStep;
+    // }
 
     rerenderLines(); // Render once per frame
   }
@@ -1099,6 +1200,28 @@
   //   console.log(JSON.stringify(lines, null, '  '))
   //   copyToClipboard(JSON.stringify(lines, null, '  '));
   // }, 1000 * 60)
+</script>
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Go-Wrap",
+    "description": "An AI model wrapper that enhances open-source models with long-term memory, function calling, and more.",
+    "url": "https://go-wrap.com",
+    "image": "https://go-wrap.com/go-wrap.png",
+    "creator": {
+      "@type": "Person",
+      "name": "Taylor Goolsby"
+    },
+    "applicationCategory": "AI Software",
+    "operatingSystem": "Cloud-based",
+    "offers": {
+      "@type": "Offer",
+      "price": "20",
+      "priceCurrency": "USD"
+    }
+  }
 </script>
 
 </body>
