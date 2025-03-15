@@ -725,7 +725,7 @@
   const chirp = new Audio('chirp.wav'); // Replace with your file name
 
   // select all button, a, and td elements, and make tap play on click
-  document.querySelectorAll('button, a, td').forEach(el => el.addEventListener('click', () => {
+  document.querySelectorAll('button, a, .td').forEach(el => el.addEventListener('click', () => {
     // play pew.wav pew2.wav or tap.wav randomly
     // const random = Math.random()
     // if (random < 0.33) {
@@ -754,16 +754,18 @@
     }, 16)
   }))
 
-  // select all buttons, a, and td elements, and on hover, play 'move-block.wav'
+  // select all buttons, a, and element with class .td, and on hover, play 'move-block.wav'
   let disableHoverSound = false
-  document.querySelectorAll('button, a, td').forEach(el => el.addEventListener('mouseover', () => {
+  document.querySelectorAll('button, a, .td').forEach(el => el.addEventListener('mouseover', () => {
     setTimeout(() => {
+      console.log('disableHoverSound', disableHoverSound)
       if (disableHoverSound) return
       // check if the element is disabled
       // if (el.hasAttribute('disabled')) return
       const moveBlock = new Audio('bloop.wav')
       // moveBlock.volume = 0.5;
       moveBlock.play()
+      console.log('play')
     }, 0)
   }))
 
