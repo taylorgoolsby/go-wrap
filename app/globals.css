@@ -1,37 +1,10 @@
-
-@import url('https://fonts.googleapis.com/css2?family=Nova+Mono&family=Sometype+Mono:ital,wght@0,400..700;1,400..700&family=Sono:wght@200..800&family=Space+Mono:wght@0,400;0,700;1,400;1,700&display=swap');
-@import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #222227;
-  --font-mono: 'Sometype Mono', monospace;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: 'Sometype Mono', monospace;
-  --font-mono: 'Sometype Mono', monospace;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html,
-body {
-  margin: 0;
-  padding: 0;
-}
-
 body {
   background-color: #fff;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  font-family: 'Sometype Mono', monospace;
+  font-family: var(--font-sometype-mono), 'Sometype Mono', monospace;
   font-size: 11px;
   color: #222227;
   margin: 0;
@@ -39,21 +12,22 @@ body {
   transform-origin: top;
   overflow: hidden;
 }
-
+dialog {
+  transform: scale(calc(16 / 11));
+}
 a {
   text-decoration: none;
 }
-
 a:visited {
   text-decoration: none;
   color: inherit;
 }
-
 a:hover {
   opacity: 1;
   text-decoration: underline;
 }
 
+/* ---- background -------------------------------------------------------- */
 #background {
   position: fixed;
   top: 0;
@@ -62,7 +36,6 @@ a:hover {
   bottom: 0;
   z-index: 0;
 }
-
 #zigzag-svg {
   position: absolute;
   top: 0;
@@ -73,32 +46,32 @@ a:hover {
   height: 100vh;
   z-index: 0;
 }
-
 #tint {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 1;
   background-color: #7a7aff;
   opacity: 0.1;
   mix-blend-mode: plus-lighter;
 }
-
 #gradient {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 1;
-  background: linear-gradient(
-    90deg,
-    rgba(215, 215, 255, 0.2),
-    rgba(0, 100, 255, 0.2)
-  );
+  background: linear-gradient(90deg, rgba(215, 215, 255, 0.2), rgba(0, 100, 255, 0.2));
   mix-blend-mode: lighten;
 }
-
 *:not(#zigzag-svg) {
   z-index: 2;
 }
 
+/* ---- layout ------------------------------------------------------------ */
 h1,
 h2 {
   margin: 0;
@@ -126,19 +99,8 @@ h2 {
   flex-direction: row;
   justify-content: space-between;
   align-self: stretch;
-  padding: 7px;
+  padding: 7px 7px;
   box-sizing: border-box;
-}
-
-.title {
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.feature-list {
-  text-align: left;
-  display: inline-block;
-  margin-bottom: 7px;
 }
 
 .table {
@@ -159,7 +121,6 @@ h2 {
   transition: opacity 80ms steps(1, end);
   user-select: none;
 }
-
 .td:hover {
   background-color: rgba(197, 212, 255, 0.3);
 }
@@ -175,9 +136,8 @@ h2 {
   flex-direction: row;
   white-space: pre;
 }
-
 .subtitle h2:first-of-type::after {
-  content: " ";
+  content: ' ';
 }
 
 .page {
@@ -189,7 +149,6 @@ h2 {
   overflow: hidden;
   justify-content: center;
 }
-
 .container-socials-wrap {
   display: flex;
   flex-direction: column;
@@ -198,7 +157,6 @@ h2 {
 .footer {
   font-size: 11px;
 }
-
 .future {
   opacity: 0.29;
   margin-top: 50px;
@@ -206,6 +164,15 @@ h2 {
   margin-bottom: 0;
 }
 
+.flex {
+  display: flex;
+}
+.row {
+  flex-direction: row;
+  align-items: center;
+}
+
+/* ---- buttons ----------------------------------------------------------- */
 button {
   width: 162px;
   height: 44px;
@@ -214,55 +181,46 @@ button {
   border-radius: 2px;
   background: none;
   cursor: pointer;
-  font-family: 'Sometype Mono', monospace;
+  font-family: var(--font-sometype-mono), 'Sometype Mono', monospace;
   font-size: 11px;
   transition: opacity 80ms steps(1, end);
 }
-
 button span {
-  opacity: 0.60;
+  opacity: 0.6;
   pointer-events: none;
   color: #222227;
 }
-
 button:hover:not([disabled]) span {
   opacity: 1;
 }
-
-.td:active,
 button:active {
   opacity: 0.3;
   transition: opacity 0ms;
 }
-
 button[disabled] {
   opacity: 0.5;
   cursor: default;
   pointer-events: none;
 }
 
-ul {
-  margin: 0;
+.small-button {
+  align-self: flex-end;
+  width: unset;
+  height: unset;
+  margin: 6px;
+  padding: 3px 12px;
+  border-width: 1px;
+  font-size: 9px;
 }
 
-.flex {
-  display: flex;
-}
-
-.row {
-  flex-direction: row;
-  align-items: center;
-}
-
+/* ---- dialogs ----------------------------------------------------------- */
 dialog {
   border: 0;
   padding: 0;
   background: transparent;
   overflow: hidden;
   outline: none;
-  transform: scale(calc(16 / 11));
 }
-
 dialog > .go-wrap {
   display: flex;
   flex-direction: column;
@@ -279,21 +237,19 @@ dialog > .go-wrap {
   justify-content: center;
   align-items: center;
   padding: 0;
+  /* width / height are set from the form's size in page.tsx */
 }
 
 #wait-wrap {
   width: 320px;
 }
-
 #wait-wrap > .form-title {
   align-self: center;
   padding: 9px;
 }
-
 #wait-wrap > div {
   margin: 6px;
 }
-
 #wait-wrap > div > *:first-child {
   flex: 1;
 }
@@ -301,11 +257,9 @@ dialog > .go-wrap {
 .model-wrapping-dialog {
   margin-top: 257px;
 }
-
 .model-wrapping-dialog-wrap.model-wrapping-dialog-wrap.model-wrapping-dialog-wrap {
   margin-top: 0;
 }
-
 .feature-dialog-wrap.feature-dialog-wrap {
   margin-top: 134px;
   width: 425px;
@@ -318,15 +272,7 @@ dialog > .go-wrap {
   white-space: pre;
   margin-bottom: 1rem;
 }
-
-.feature-dialog-title strong {
-  color: white;
-  background-color: rgba(34, 34, 39, 0.97);
-  border-radius: 2px;
-  padding: 0 3px;
-  font-weight: normal;
-}
-
+.feature-dialog-title strong,
 .feature-dialog-description strong {
   color: white;
   background-color: rgba(34, 34, 39, 0.97);
@@ -335,59 +281,24 @@ dialog > .go-wrap {
   font-weight: normal;
 }
 
+/* ---- form controls ----------------------------------------------------- */
 input,
 textarea {
   font-size: 11px;
-  font-family: 'Sometype Mono', monospace;
+  font-family: var(--font-sometype-mono), 'Sometype Mono', monospace;
   outline: none;
   border: 1px solid #222227;
   border-radius: 2px;
   padding: 2px 4px;
   width: 180px;
 }
-
 textarea {
   resize: vertical;
 }
 
-.small-button {
-  align-self: flex-end;
-  width: unset;
-  height: unset;
-  margin: 6px;
-  padding: 3px 12px;
-  border-width: 1px;
-  font-size: 9px;
-}
-
+/* ---- links & icons ----------------------------------------------------- */
 .zigzag-line {
   opacity: 1;
-}
-
-.tooltip {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 3;
-  pointer-events: none;
-}
-
-.tooltip.closed {
-  display: none;
-}
-
-.tooltip-arrow {
-  background-color: white;
-}
-
-.tooltip-content {
-  background-color: white;
-  padding: 12px;
-  border: 2px solid #222227;
-  border-radius: 2px;
-  font-size: 11px;
 }
 
 .model-wrapping-link {
@@ -395,7 +306,6 @@ textarea {
   cursor: pointer;
   color: rgb(20, 53, 186);
 }
-
 .model-wrapping-link:hover {
   color: #222227;
 }
@@ -404,7 +314,6 @@ a.handle {
   opacity: 0.29;
   color: #222227;
 }
-
 a.handle:hover {
   opacity: 1;
 }
@@ -412,53 +321,46 @@ a.handle:hover {
 a.icon {
   line-height: 0;
 }
-
 a.icon svg {
   pointer-events: none;
 }
-
 a.icon:hover svg path,
 a.icon:hover svg circle {
   fill-opacity: 1;
 }
-
 a.heart:hover svg path {
   fill: rgba(255, 121, 157, 0.9);
 }
-
 a.github:hover svg path {
-  fill: rgba(34, 34, 39, 0.90);
+  fill: rgba(34, 34, 39, 0.9);
 }
-
 a.discord:hover svg circle {
   fill: rgba(109, 105, 255, 0.9);
 }
 
+/* ---- highlight colors (used in dialog copy) ---------------------------- */
 strong.green {
   background-color: rgb(223, 255, 225);
   color: #222227;
 }
-
 strong.orange {
   background-color: rgb(250, 234, 214);
   color: #222227;
 }
-
 strong.red {
   background-color: rgb(255, 222, 231);
   color: #222227;
 }
-
 strong.blue {
   background-color: rgba(197, 212, 255, 0.3);
   color: #222227;
 }
 
+/* ---- rainbow text ------------------------------------------------------ */
 @keyframes rainbowScroll {
   0% {
     background-position: 200% 50%;
   }
-
   100% {
     background-position: 0% 50%;
   }
@@ -477,11 +379,13 @@ strong.blue {
   );
   background-size: 200% 100%;
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
   animation: rainbowScroll 3s linear infinite;
 }
 
+/* ---- mobile ------------------------------------------------------------ */
 @media (max-width: 768px) {
   body {
     height: unset;
@@ -492,7 +396,6 @@ strong.blue {
   dialog {
     transform: unset;
   }
-
   dialog > * {
     max-width: 242px;
   }
@@ -515,9 +418,8 @@ strong.blue {
   .subtitle {
     flex-direction: column;
   }
-
   .subtitle h2:first-of-type::after {
-    content: "";
+    content: '';
   }
 
   .model-wrapping-dialog {
@@ -532,7 +434,6 @@ strong.blue {
     flex-direction: column;
     align-items: center;
   }
-
   .buttons > *:first-child {
     margin-bottom: 32px;
   }
