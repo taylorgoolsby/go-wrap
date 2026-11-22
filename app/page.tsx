@@ -20,58 +20,67 @@ type Feature = {
 }
 
 // Rendered in grid order (4 columns x 3 rows).
+
 const FEATURES: Feature[] = [
   {
-    label: ['CHAT', 'INTERFACE'],
-    description: 'We provide a conversational chat interface for interacting with any bots you create.',
-  },
-  {
-    label: ['SERVERLESS', 'CHAT API'],
+    label: ['AGENTIC', 'CHAT'],
     description:
-      'A chat API for interacting with any bots you create. Uses modal.com for serverless AI infrastructure.',
+      'Interact with open-source AI models through a familiar chat interface, with built-in agent capabilities.',
   },
   {
-    label: ['FUNCTION', 'CALLING'],
-    description: 'Give your model function calling capabilities to interact with the world. Write your own plugins.',
-  },
-  {
-    label: ['LONG TERM', 'MEMORY'],
-    description: 'The model knows what it knows. It can remember things over time.',
-  },
-  {
-    label: ['LOGS'],
-    description: 'Record events and messages for tracking, debugging, insights, and future distillation.',
-  },
-  {
-    label: ['SELF-MANAGED', 'DATABASES'],
-    description: 'The model can manage its own vector and relational databases. Users may review and edit.',
-  },
-  {
-    label: ['SELF-REFINING', 'CAPABILITIES'],
-    description: 'With help from user feedback, the model reaches for truth and grows.',
-  },
-  {
-    label: ['TRANSFER', 'LEARNING'],
-    description: 'Review the transfer learning process. Setup timers. Check version history. Perform evals.',
-  },
-  {
-    label: ['OBJECTIVE', 'GUIDANCE'],
+    label: ['SERVERLESS', 'API'],
     description:
-      'Models are trained to identify user learning objectives and guide them towards them while solving distraction trajectories.',
+      "Access open-source models through a unified chat API, powered by Modal's serverless GPU infrastructure.",
   },
   {
-    label: ['PROJECTS', 'ASSIGNMENTS'],
+    label: ['TOOL', 'CALLING'],
     description:
-      'Models are trained in managing projects, assignments, assets and liabilities. They can help you manage your life.',
+      'Extend agents with external tools and capabilities through the Model Context Protocol (MCP).',
   },
   {
-    label: ['AGENTIC', 'CHANNELS'],
+    label: ['LONG-TERM', 'MEMORY'],
     description:
-      'Multiple AIs with different tasks and personality can interact together in a shared environment.',
+      'Give agents persistent memory by retrieving relevant information from past conversations using RAG.',
   },
   {
-    label: ['DISCORD', 'SUPPORT'],
-    description: 'Get help and interact with the community directly on Discord.',
+    label: ['PAYG'],
+    description:
+      'Pay only for the resources you use, with usage-based pricing for model inference and GPU compute.',
+  },
+  {
+    label: ['MODEL', 'SELECTION'],
+    description:
+      "Choose from Hugging Face's open-source model ecosystem and deploy models as fully featured AI agents.",
+  },
+  {
+    label: ['GPU', 'SELECTION'],
+    description:
+      'Choose the GPU hardware used to run model inference through Modal.',
+  },
+  {
+    label: ['PERSISTENT', 'SANDBOX'],
+    description:
+      'Give agents access to a persistent execution environment that retains files and state between sessions.',
+  },
+  {
+    label: ['CODING', 'AGENTS'],
+    description:
+      'Use AI coding agents that can inspect, modify, and execute code directly within your codebase.',
+  },
+  {
+    label: ['PROJECTS'],
+    description:
+      'Organize conversations and resources into workspaces that maintain shared context across multiple conversations.',
+  },
+  {
+    label: ['AGENT', 'ORCHESTRATION'],
+    description:
+      'Coordinate multiple specialized agents to collaboratively accomplish complex tasks.',
+  },
+  {
+    label: ['DISCORD', 'COMMUNITY'],
+    description:
+      'Get support, share feedback, and interact with the Go-Wrap community directly on Discord.',
   },
 ]
 
@@ -115,6 +124,7 @@ const ANGLE = 20 // angle of zigzag turns (degrees)
 const COLOR_1 = '#d9dbe2' // even rows
 const COLOR_2 = '#e9e9e9' // odd rows
 const SVG_NS = 'http://www.w3.org/2000/svg'
+const MAX_FRAME_DELTA_MS = 100 // cap per-frame time advance so hidden tabs don't fast-forward the animation
 
 type Point = { x0: number; y0: number; x: number; y: number; t0: number }
 
@@ -124,6 +134,11 @@ const clamp01 = (v: number) => Math.max(0, Math.min(v, 1))
  * Draws the scrolling zigzag lines into `svgRef` while `active` is true.
  * Paths are created imperatively (60fps updates would be wasteful through React state)
  * and removed again on cleanup.
+ *
+ * Time is driven by a virtual clock that only advances while frames are rendered
+ * (and by at most MAX_FRAME_DELTA_MS per frame). requestAnimationFrame pauses in
+ * background tabs, so using wall-clock time would make every point jump far off
+ * screen when the tab regains focus.
  */
 function useZigzag(svgRef: RefObject<SVGSVGElement | null>, active: boolean) {
   useEffect(() => {
@@ -136,6 +151,10 @@ function useZigzag(svgRef: RefObject<SVGSVGElement | null>, active: boolean) {
 
     const lines: Point[][] = []
     const paths: SVGPathElement[] = []
+
+    // Virtual clock in milliseconds.
+    let clock = 0
+    let lastFrameTime = performance.now()
 
     // --- initial pattern ---
     for (let i = 0; i < rows; i++) {
@@ -161,7 +180,7 @@ function useZigzag(svgRef: RefObject<SVGSVGElement | null>, active: boolean) {
         const yNext = yOffset + sineWave / 2
 
         pathData += `L ${xNext} ${yNext} `
-        points.push({ x, y, x0: x, y0: y, t0: Date.now() })
+        points.push({ x, y, x0: x, y0: y, t0: clock })
         x = xNext
         y = yNext
       }
@@ -191,16 +210,17 @@ function useZigzag(svgRef: RefObject<SVGSVGElement | null>, active: boolean) {
         const triangleWave = alternator * SEGMENT_LENGTH * tan
         // This point is off-screen, so the sine attenuation is maxed out (no-op).
         const yNext = middleY + triangleWave / 2
-        points.push({ x0: xNext, y0: yNext, x: xNext, y: yNext, t0: Date.now() })
+        points.push({ x0: xNext, y0: yNext, x: xNext, y: yNext, t0: clock })
       }
     }
 
     const removeFrontColumn = () => {
-      for (const points of lines) points.shift()
+      for (const points of lines) {
+        if (points.length > 1) points.shift()
+      }
     }
 
     const update = () => {
-      const now = Date.now()
       let createNew = false
       let removeFront = false
 
@@ -209,7 +229,7 @@ function useZigzag(svgRef: RefObject<SVGSVGElement | null>, active: boolean) {
         const middleY = i * Y_STEP
 
         for (const p of points) {
-          const t = (now - p.t0) / 1000
+          const t = (clock - p.t0) / 1000
           p.x = p.x0 - t * 30 - Math.exp(t * 0.14)
           const lerpY = clamp01(p.x / window.innerWidth)
           p.y = (p.y0 - middleY) * Math.sin(lerpY * (Math.PI / 2)) + middleY
@@ -232,8 +252,14 @@ function useZigzag(svgRef: RefObject<SVGSVGElement | null>, active: boolean) {
       }
     }
 
-    let raf = requestAnimationFrame(function loop() {
+    let raf = requestAnimationFrame(function loop(ts) {
       raf = requestAnimationFrame(loop)
+
+      // Advance the virtual clock only by the (capped) time since the last rendered frame.
+      const delta = Math.min(Math.max(ts - lastFrameTime, 0), MAX_FRAME_DELTA_MS)
+      lastFrameTime = ts
+      clock += delta
+
       update()
       render()
     })
