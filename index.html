@@ -554,7 +554,7 @@
     <div class="container">
       <h1>WELCOME TO GO-WRAP</h1>
       <div class="subtitle">
-        <h2>WRAP ANY <a class="model-wrapping-link" onclick="featureClick(event)">OS MODEL</a>.</h2><h2>BECOME <span id="rainbow-text">FEATURE COMPLETE</span>.</h2>
+        <h2>WRAP ANY <a class="model-wrapping-link" onclick="featureClick(event)">OS MODEL</a>.</h2><h2>GET <span id="rainbow-text">AGENTIC CHAT</span>.</h2>
       </div>
       <div class="table">
         <div class="td" onclick="featureClick(event)">
@@ -723,7 +723,7 @@
 
   let coloredPieces = 0
 
-  const chirp = new Audio('chirp.wav'); // Replace with your file name
+  const chirp = new Audio('public/chirp.wav'); // Replace with your file name
 
   // select all button, a, and td elements, and make tap play on click
   document.querySelectorAll('button, a, .td').forEach(el => el.addEventListener('click', () => {
@@ -740,13 +740,13 @@
     //   pew2.play()
     //
     // }
-    const tap = new Audio('tap.wav')
+    const tap = new Audio('public/tap.wav')
     // tap.volume = 0.5;
     tap.play()
   }))
   // select all dialogs, and on close, play 'swipe+place.wav'
   document.querySelectorAll('dialog').forEach(el => el.addEventListener('close', () => {
-    const swipe = new Audio('swipe+place.wav')
+    const swipe = new Audio('public/swipe+place.wav')
     // swipe.volume = 0.5;
     swipe.play()
     disableHoverSound = true
@@ -763,7 +763,7 @@
       if (disableHoverSound) return
       // check if the element is disabled
       // if (el.hasAttribute('disabled')) return
-      const moveBlock = new Audio('bloop.wav')
+      const moveBlock = new Audio('public/bloop.wav')
       // moveBlock.volume = 0.5;
       moveBlock.play()
       console.log('play')
@@ -895,7 +895,7 @@
       e.target.style.backgroundColor = newColor
       coloredPieces++
       if (coloredPieces === 13) {
-        const pew = new Audio('pew.wav')
+        const pew = new Audio('public/pew.wav')
         pew.play()
       }
     } else if (currentColor === 'rgb(223, 255, 225)') {

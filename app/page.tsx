@@ -506,9 +506,9 @@ export default function Page() {
                 .
               </h2>
               <h2>
-                BECOME{' '}
+                GET{' '}
                 <span id="rainbow-text" className={rainbow ? 'rainbow-text' : undefined}>
-                  FEATURE COMPLETE
+                  AGENTIC CHAT
                 </span>
                 .
               </h2>
