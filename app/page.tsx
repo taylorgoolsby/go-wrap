@@ -366,7 +366,7 @@ export default function Page() {
   const disableHoverSound = useRef(false)
 
   const coloredCount = marks.filter(Boolean).length
-  const rainbow = coloredCount === TOTAL_PIECES
+  const rainbow = coloredCount === TOTAL_PIECES || revealed
 
   useZigzag(svgRef, revealed)
 
@@ -422,9 +422,11 @@ export default function Page() {
   // ---- hidden game mode: Cmd+E, then arrow keys ---------------------------------
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.metaKey && e.key === 'e') {
+      if (e.ctrlKey && e.key === 'e') {
         setGameMode(true)
         return
+      } else if (e.ctrlKey && e.key === 't') {
+        setRevealed(true)
       }
       if (!gameMode) return
 

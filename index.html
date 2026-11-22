@@ -1131,7 +1131,7 @@
   let table;
 
   window.addEventListener('keydown', (e) => {
-    if (e.metaKey && e.key === 'e') {
+    if (e.ctrlKey && e.key === 'e') {
       gameMode = true;
 
       table = document.querySelector('.table');
@@ -1141,6 +1141,9 @@
       });
 
       table.children[playerIndex].style.backgroundColor = 'rgb(255, 222, 231)';
+    } else if (e.ctrlKey && e.key === 't') {
+      document.getElementById('rainbow-text').classList.add('rainbow-text');
+      reveal();
     }
 
     if (e.key === 'ArrowUp') {
