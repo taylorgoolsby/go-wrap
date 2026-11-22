@@ -508,7 +508,7 @@ export default function Page() {
               <h2>
                 GET{' '}
                 <span id="rainbow-text" className={rainbow ? 'rainbow-text' : undefined}>
-                  AGENTIC CHAT
+                  AGENTIC
                 </span>
                 .
               </h2>
