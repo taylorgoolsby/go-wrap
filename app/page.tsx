@@ -22,13 +22,13 @@ type Feature = {
 // Rendered in grid order (4 columns x 3 rows).
 const FEATURES: Feature[] = [
   {
+    label: ['CHAT', 'INTERFACE'],
+    description: 'We provide a conversational chat interface for interacting with any bots you create.',
+  },
+  {
     label: ['SERVERLESS', 'CHAT API'],
     description:
       'A chat API for interacting with any bots you create. Uses modal.com for serverless AI infrastructure.',
-  },
-  {
-    label: ['CHAT', 'INTERFACE'],
-    description: 'We provide a conversational chat interface for interacting with any bots you create.',
   },
   {
     label: ['FUNCTION', 'CALLING'],
@@ -506,9 +506,9 @@ export default function Page() {
                 .
               </h2>
               <h2>
-                GET{' '}
+                MAKE IT{' '}
                 <span id="rainbow-text" className={rainbow ? 'rainbow-text' : undefined}>
-                  AGENTIC
+                  FEATURE COMPLETE
                 </span>
                 .
               </h2>
