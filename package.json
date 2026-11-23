@@ -1,12 +1,13 @@
 {
-  "name": "my-aws-lambda-app",
+  "name": "go-wrap",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "provision": "bash scripts/provision.sh tgoolsby92 us-east-1"
   },
   "dependencies": {
     "next": "16.4.6",

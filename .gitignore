@@ -42,3 +42,7 @@ next-env.d.ts
 
 .ai-session.*.jsonl
 .ai-session.jsonl
+
+project.zip
+
+/deploy/
