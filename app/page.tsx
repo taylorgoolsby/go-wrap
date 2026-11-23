@@ -446,15 +446,40 @@ export default function Page() {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.key === 'e') {
         setGameMode(true)
+        play('/bloop.wav')
         return
       } else if (e.ctrlKey && e.key === 't') {
         setRevealed(true)
+        play('/pew.wav')
       }
       if (!gameMode) return
 
+      // While a feature description is open, Enter closes it. close() fires the dialog's
+      // onClose handler, which plays swipe+place.
+      if (featureDialogRef.current?.open) {
+        if (e.key === 'Enter') {
+          e.preventDefault()
+          if (!e.repeat) featureDialogRef.current.close()
+        }
+        return
+      }
+
+      // Ignore game input while the waitlist dialog is open.
+      if (waitlistDialogRef.current?.open) return
+
       const cols = 4
       const rows = FEATURES.length / cols
+
+      if (e.key.startsWith('Arrow')) play('/bloop.wav')
+
       switch (e.key) {
+        case 'Enter':
+          // Open the description of the highlighted cell.
+          e.preventDefault()
+          if (e.repeat) break
+          play('/tap.wav')
+          handleFeatureClick(playerIndex, { kind: 'feature', index: playerIndex })
+          break
         case 'ArrowUp':
           // Wrap from the top row to the bottom row of the same column.
           setPlayerIndex((p) => (p - cols < 0 ? p + (rows - 1) * cols : p - cols))
@@ -480,7 +505,7 @@ export default function Page() {
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [gameMode])
+  }, [gameMode, playerIndex])
 
   const cellBackground = (i: number) => {
     if (gameMode) return i === playerIndex ? RED : GREEN

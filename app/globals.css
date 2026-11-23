@@ -234,6 +234,10 @@ dialog > .go-wrap {
   padding: 10px 36px; /* 7 25 */
 }
 
+#waitlist-dialog {
+  top: -88px;
+}
+
 #waitlist-dialog .completion {
   display: none;
   box-sizing: border-box;
@@ -244,7 +248,7 @@ dialog > .go-wrap {
 }
 
 #wait-wrap {
-  width: 465px; /* 320 */
+  width: 491px; /* 320 */
 }
 #wait-wrap > .form-title {
   align-self: center;
@@ -272,7 +276,7 @@ dialog > .go-wrap {
   margin-top: 9px;
 }
 .feature-dialog-wrap.feature-dialog-wrap {
-  margin-top: 195px; /* 134 */
+  margin-top: 202px; /* 134 */
   width: 622px; /* 424 */
   padding: 26px 36px; /* 18 25 */
 }
