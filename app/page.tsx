@@ -453,13 +453,15 @@ export default function Page() {
       if (!gameMode) return
 
       const cols = 4
-      const last = FEATURES.length - 1
+      const rows = FEATURES.length / cols
       switch (e.key) {
         case 'ArrowUp':
-          setPlayerIndex((p) => (p - cols < 0 ? p : p - cols))
+          // Wrap from the top row to the bottom row of the same column.
+          setPlayerIndex((p) => (p - cols < 0 ? p + (rows - 1) * cols : p - cols))
           break
         case 'ArrowDown':
-          setPlayerIndex((p) => (p + cols > last ? p : p + cols))
+          // Wrap from the bottom row to the top row of the same column.
+          setPlayerIndex((p) => (p + cols >= FEATURES.length ? p % cols : p + cols))
           break
         case 'ArrowRight':
           setPlayerIndex((p) => {
