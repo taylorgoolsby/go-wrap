@@ -1,3 +1,4 @@
+// layout.tsx
 import type { Metadata } from 'next'
 import { Sometype_Mono } from 'next/font/google'
 import './globals.css'

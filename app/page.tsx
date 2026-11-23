@@ -1,3 +1,4 @@
+// page.tsx
 'use client'
 
 import {
@@ -126,6 +127,12 @@ const COLOR_2 = '#e9e9e9' // odd rows
 const SVG_NS = 'http://www.w3.org/2000/svg'
 const MAX_FRAME_DELTA_MS = 100 // cap per-frame time advance so hidden tabs don't fast-forward the animation
 
+// The page used to be magnified by 16/11 on desktop (not on mobile) via a CSS transform on
+// <body>. The zigzag simulation below is still authored in that original, pre-magnified
+// coordinate space, so we map it to the screen with the SVG viewBox instead of a transform.
+const DESKTOP_LAYOUT_SCALE = 16 / 11
+const MOBILE_QUERY = '(max-width: 768px)'
+
 type Point = { x0: number; y0: number; x: number; y: number; t0: number }
 
 const clamp01 = (v: number) => Math.max(0, Math.min(v, 1))
@@ -144,6 +151,17 @@ function useZigzag(svgRef: RefObject<SVGSVGElement | null>, active: boolean) {
   useEffect(() => {
     const svg = svgRef.current
     if (!active || !svg) return
+
+    // Show the centered, top-anchored window of simulation space that the old
+    // scale(16/11) transform (origin: top center) used to reveal.
+    const updateViewBox = () => {
+      const k = window.matchMedia(MOBILE_QUERY).matches ? 1 : DESKTOP_LAYOUT_SCALE
+      const w = window.innerWidth
+      const h = window.innerHeight
+      svg.setAttribute('viewBox', `${w / 2 - w / (2 * k)} 0 ${w / k} ${h / k}`)
+    }
+    updateViewBox()
+    window.addEventListener('resize', updateViewBox)
 
     const tan = Math.tan((ANGLE * Math.PI) / 180)
     const rows = Math.ceil(window.innerHeight / Y_STEP)
@@ -266,6 +284,8 @@ function useZigzag(svgRef: RefObject<SVGSVGElement | null>, active: boolean) {
 
     return () => {
       cancelAnimationFrame(raf)
+      window.removeEventListener('resize', updateViewBox)
+      svg.removeAttribute('viewBox')
       for (const path of paths) path.remove()
     }
   }, [svgRef, active])
@@ -274,6 +294,8 @@ function useZigzag(svgRef: RefObject<SVGSVGElement | null>, active: boolean) {
 /* -------------------------------------------------------------------------- */
 /* Icons                                                                      */
 /* -------------------------------------------------------------------------- */
+
+// Icon sizes (and spacing between them) are set in globals.css under `a.icon`.
 
 function HeartIcon() {
   return (
@@ -496,7 +518,6 @@ export default function Page() {
     if (aborted.current) return
 
     // Keep the "thank you" panel the same size as the form it replaces.
-    // offsetWidth/offsetHeight are layout sizes, so they ignore the dialog's scale transform.
     const wrap = waitFormRef.current
     if (wrap) setCompletionSize({ width: wrap.offsetWidth, height: wrap.offsetHeight })
 
@@ -582,7 +603,6 @@ export default function Page() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="icon heart"
-                style={{ marginRight: 16 }}
               >
                 <HeartIcon />
               </a>
@@ -591,7 +611,6 @@ export default function Page() {
                 href="https://github.com/taylorgoolsby/go-wrap"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ marginRight: 16 }}
               >
                 <GithubIcon />
               </a>

@@ -1,3 +1,10 @@
+/* globals.css
+ *
+ * The old `transform: scale(calc(16 / 11))` on body/dialog has been baked in:
+ * every length below on the desktop layout is the original value * 16/11.
+ * The mobile block at the bottom restores the original (unscaled) values,
+ * since the transform was already disabled there.
+ */
 body {
   background-color: #fff;
   display: flex;
@@ -5,15 +12,11 @@ body {
   justify-content: center;
   align-items: center;
   font-family: var(--font-sometype-mono), 'Sometype Mono', monospace;
-  font-size: 11px;
+  font-size: 16px; /* 11 */
+  line-height: 20px;
   color: #222227;
   margin: 0;
-  transform: scale(calc(16 / 11));
-  transform-origin: top;
   overflow: hidden;
-}
-dialog {
-  transform: scale(calc(16 / 11));
 }
 a {
   text-decoration: none;
@@ -75,7 +78,7 @@ a:hover {
 h1,
 h2 {
   margin: 0;
-  font-size: 11px;
+  font-size: 16px; /* 11 */
   font-weight: normal;
 }
 
@@ -85,12 +88,12 @@ h2 {
   justify-content: space-evenly;
   background-color: white;
   align-items: center;
-  padding-bottom: 12px;
-  border: 3px solid rgba(34, 34, 39, 0.97);
-  border-radius: 2px;
+  padding-bottom: 17px; /* 12 */
+  border: 4px solid rgba(34, 34, 39, 0.97); /* 3 */
+  border-radius: 3px; /* 2 */
   text-align: center;
-  width: 642px;
-  height: 387px;
+  width: 934px; /* 642 */
+  height: 563px; /* 387 */
   box-sizing: border-box;
 }
 
@@ -99,7 +102,7 @@ h2 {
   flex-direction: row;
   justify-content: space-between;
   align-self: stretch;
-  padding: 7px 7px;
+  padding: 10px 10px; /* 7 */
   box-sizing: border-box;
 }
 
@@ -114,8 +117,8 @@ h2 {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 108px;
-  height: 54px;
+  width: 157px; /* 108 */
+  height: 79px; /* 54 */
   box-sizing: border-box;
   cursor: pointer;
   transition: opacity 80ms steps(1, end);
@@ -144,8 +147,8 @@ h2 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: calc(100vh * 11 / 16);
-  width: calc(100vw * 11 / 16);
+  min-height: 100vh; /* was calc(100vh * 11 / 16) before scaling */
+  width: 100vw; /* was calc(100vw * 11 / 16) before scaling */
   overflow: hidden;
   justify-content: center;
 }
@@ -155,11 +158,11 @@ h2 {
 }
 
 .footer {
-  font-size: 11px;
+  font-size: 16px; /* 11 */
 }
 .future {
   opacity: 0.29;
-  margin-top: 50px;
+  margin-top: 73px; /* 50 */
   margin-left: 0;
   margin-bottom: 0;
 }
@@ -174,15 +177,15 @@ h2 {
 
 /* ---- buttons ----------------------------------------------------------- */
 button {
-  width: 162px;
-  height: 44px;
-  border: 3px solid rgba(34, 34, 39, 0.97);
+  width: 236px; /* 162 */
+  height: 64px; /* 44 */
+  border: 4px solid rgba(34, 34, 39, 0.97); /* 3 */
   box-sizing: border-box;
-  border-radius: 2px;
+  border-radius: 3px; /* 2 */
   background: none;
   cursor: pointer;
   font-family: var(--font-sometype-mono), 'Sometype Mono', monospace;
-  font-size: 11px;
+  font-size: 16px; /* 11 */
   transition: opacity 80ms steps(1, end);
 }
 button span {
@@ -207,10 +210,10 @@ button[disabled] {
   align-self: flex-end;
   width: unset;
   height: unset;
-  margin: 6px;
-  padding: 3px 12px;
-  border-width: 1px;
-  font-size: 9px;
+  margin: 9px; /* 6 */
+  padding: 4px 17px; /* 3 12 */
+  border-width: 1px; /* 1 */
+  font-size: 13px; /* 9 */
 }
 
 /* ---- dialogs ----------------------------------------------------------- */
@@ -225,10 +228,10 @@ dialog > .go-wrap {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  border: 3px solid rgba(34, 34, 39, 0.97);
-  border-radius: 2px;
+  border: 4px solid rgba(34, 34, 39, 0.97); /* 3 */
+  border-radius: 3px; /* 2 */
   background-color: white;
-  padding: 7px 25px;
+  padding: 10px 36px; /* 7 25 */
 }
 
 #waitlist-dialog .completion {
@@ -241,56 +244,64 @@ dialog > .go-wrap {
 }
 
 #wait-wrap {
-  width: 320px;
+  width: 465px; /* 320 */
 }
 #wait-wrap > .form-title {
   align-self: center;
-  padding: 9px;
+  padding: 13px; /* 9 */
 }
 #wait-wrap > div {
-  margin: 6px;
+  margin: 9px; /* 6 */
 }
 #wait-wrap > div > *:first-child {
   flex: 1;
 }
 
+/*
+ * Originally: margin-top 257px on a dialog that was scaled about its center.
+ * That put the dialog's *layout* top at 257px, and the scale grew it equally
+ * up and down. Now that the dialog is already full size, we keep the 257px top
+ * and pull it up by 5/32 of its own height, which is the amount the old scale
+ * moved the visual top edge. (15.625% = (k - 1) / (2k) with k = 16/11.)
+ */
 .model-wrapping-dialog {
   margin-top: 257px;
+  transform: translateY(-15.625%);
 }
 .model-wrapping-dialog-wrap.model-wrapping-dialog-wrap.model-wrapping-dialog-wrap {
-  margin-top: 0;
+  margin-top: 9px;
 }
 .feature-dialog-wrap.feature-dialog-wrap {
-  margin-top: 134px;
-  width: 424px;
-  padding: 18px 25px;
+  margin-top: 195px; /* 134 */
+  width: 622px; /* 424 */
+  padding: 26px 36px; /* 18 25 */
 }
 
 .feature-dialog-title {
   display: flex;
   flex-direction: row;
   white-space: pre;
-  margin-bottom: 1rem;
+  margin-bottom: 23px; /* 1rem */
 }
 .feature-dialog-title strong,
 .feature-dialog-description strong {
   color: white;
   background-color: rgba(34, 34, 39, 0.97);
-  border-radius: 2px;
-  padding: 0 3px;
+  border-radius: 3px; /* 2 */
+  padding: 0 4px; /* 3 */
   font-weight: normal;
 }
 
 /* ---- form controls ----------------------------------------------------- */
 input,
 textarea {
-  font-size: 11px;
+  font-size: 16px; /* 11 */
   font-family: var(--font-sometype-mono), 'Sometype Mono', monospace;
   outline: none;
-  border: 1px solid #222227;
-  border-radius: 2px;
-  padding: 2px 4px;
-  width: 180px;
+  border: 1px solid #222227; /* 1 */
+  border-radius: 3px; /* 2 */
+  padding: 3px 6px; /* 2 4 */
+  width: 262px; /* 180 */
 }
 textarea {
   resize: vertical;
@@ -322,7 +333,13 @@ a.icon {
   line-height: 0;
 }
 a.icon svg {
+  width: 20px; /* 14 */
+  height: 20px; /* 14 */
   pointer-events: none;
+}
+a.icon.heart,
+a.icon.github {
+  margin-right: 23px; /* 16 */
 }
 a.icon:hover svg path,
 a.icon:hover svg circle {
@@ -385,17 +402,22 @@ strong.blue {
   animation: rainbowScroll 3s linear infinite;
 }
 
-/* ---- mobile ------------------------------------------------------------ */
+/* ---- mobile ------------------------------------------------------------
+ * The scale was never applied here, so everything the desktop rules above
+ * scaled is restored to its original, unscaled value.
+ */
 @media (max-width: 768px) {
   body {
     height: unset;
     overflow: unset;
-    transform: unset;
+    font-size: 11px;
   }
 
-  dialog {
-    transform: unset;
+  h1,
+  h2 {
+    font-size: 11px;
   }
+
   dialog > * {
     max-width: 242px;
   }
@@ -404,10 +426,27 @@ strong.blue {
     margin-top: 30px;
     width: 244px;
     height: 940px;
+    padding-bottom: 12px;
+    border-width: 3px;
+    border-radius: 2px;
+  }
+
+  .socials {
+    padding: 7px 7px;
+  }
+
+  .td {
+    width: 108px;
+    height: 54px;
   }
 
   .page {
     width: 100vw;
+    min-height: calc(100vh * 11 / 16);
+  }
+
+  .footer {
+    font-size: 11px;
   }
 
   .table {
@@ -422,12 +461,60 @@ strong.blue {
     content: '';
   }
 
+  button {
+    width: 162px;
+    height: 44px;
+    border-width: 3px;
+    border-radius: 2px;
+    font-size: 11px;
+  }
+  .small-button {
+    width: unset;
+    height: unset;
+    margin: 6px;
+    padding: 3px 12px;
+    border-width: 1px;
+    font-size: 9px;
+  }
+
+  dialog > .go-wrap {
+    border-width: 3px;
+    border-radius: 2px;
+    padding: 7px 25px;
+  }
+
+  #wait-wrap {
+    width: 320px;
+  }
+  #wait-wrap > .form-title {
+    padding: 9px;
+  }
+  #wait-wrap > div {
+    margin: 6px;
+  }
+
   .model-wrapping-dialog {
     margin-top: 81px;
+    transform: none;
+  }
+
+  .model-wrapping-dialog-wrap.model-wrapping-dialog-wrap.model-wrapping-dialog-wrap {
+    margin-top: 17px;
   }
 
   .feature-dialog-wrap.feature-dialog-wrap {
     margin-top: 0;
+    width: 424px;
+    padding: 18px 25px;
+  }
+
+  .feature-dialog-title {
+    margin-bottom: 1rem;
+  }
+  .feature-dialog-title strong,
+  .feature-dialog-description strong {
+    border-radius: 2px;
+    padding: 0 3px;
   }
 
   .buttons {
@@ -439,11 +526,25 @@ strong.blue {
   }
 
   .future {
+    margin-top: 50px;
     margin-bottom: 30px;
+  }
+
+  a.icon svg {
+    width: 14px;
+    height: 14px;
+  }
+  a.icon.heart,
+  a.icon.github {
+    margin-right: 16px;
   }
 
   input,
   textarea {
+    font-size: 11px;
+    border-width: 1px;
+    border-radius: 2px;
+    padding: 2px 4px;
     width: 106px;
   }
 }
