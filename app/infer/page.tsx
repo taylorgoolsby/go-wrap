@@ -1,0 +1,113 @@
+// infer/page.tsx
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import styles from "./infer.module.css";
+import ZigzagBackground from '@/components/ZigzagBackground'
+
+type Message = {
+  role: "user" | "assistant";
+  content: string;
+};
+
+const models = ["Llama 3.2 3B", "Qwen 3 4B", "Ministral 8B"];
+
+export default function InferPage() {
+  const [model, setModel] = useState(models[0]);
+  const [prompt, setPrompt] = useState("");
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const value = prompt.trim();
+    if (!value) return;
+
+    setMessages((previous) => [...previous, { role: "user", content: value }]);
+    setPrompt("");
+  }
+
+  return (
+    <>
+      <ZigzagBackground/>
+
+      <main className={styles.page}>
+        <header className={styles.header}>
+          <Link href="/" className={styles.logo}>
+            GO-WRAP
+          </Link>
+
+          <span className={styles.headerLabel}>INFERENCE PLAYGROUND</span>
+        </header>
+
+        <section className={styles.content}>
+          <div className={styles.heading}>
+            <h1>Talk to a model.</h1>
+            <p>Experiment with open models through a unified interface.</p>
+          </div>
+
+          <div className={styles.modelSelector}>
+            <label htmlFor="model">MODEL</label>
+            <select
+              id="model"
+              value={model}
+              onChange={(event) => setModel(event.target.value)}
+            >
+              {models.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className={styles.chat}>
+            {messages.length === 0 ? (
+              <div className={styles.emptyState}>
+                <span>↳</span>
+                <p>Your conversation starts here.</p>
+              </div>
+            ) : (
+              <div className={styles.messages}>
+                {messages.map((message, index) => (
+                  <div
+                    key={index}
+                    className={`${styles.message} ${
+                      message.role === "user"
+                        ? styles.userMessage
+                        : styles.assistantMessage
+                    }`}
+                  >
+                    <span>{message.role === "user" ? "YOU" : "MODEL"}</span>
+                    <p>{message.content}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <form className={styles.promptForm} onSubmit={handleSubmit}>
+            <textarea
+              value={prompt}
+              onChange={(event) => setPrompt(event.target.value)}
+              placeholder="Send a message..."
+              rows={3}
+            />
+
+            <div className={styles.formFooter}>
+              <span>{model}</span>
+              <button type="submit">
+                <span>SEND ↗</span>
+              </button>
+            </div>
+          </form>
+
+          <p className={styles.disclaimer}>
+            Responses are not connected to an inference provider yet.
+          </p>
+        </section>
+      </main>
+    </>
+  );
+}

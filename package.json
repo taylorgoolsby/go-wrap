@@ -11,6 +11,8 @@
     "deploy": "bash scripts/deploy.sh tgoolsby92 us-east-1"
   },
   "dependencies": {
+    "mobx": "^7.1.7",
+    "mobx-react-lite": "^5.1.4",
     "next": "16.4.6",
     "react": "19.3.0",
     "react-dom": "19.3.0"

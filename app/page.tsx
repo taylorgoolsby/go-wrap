@@ -10,6 +10,9 @@ import {
   type MouseEvent as ReactMouseEvent,
   type RefObject,
 } from 'react'
+import {useRouter} from 'next/navigation'
+import ZigzagBackground from '@/components/ZigzagBackground'
+import appStore from '@/stores/AppStore'
 
 /* -------------------------------------------------------------------------- */
 /* Content                                                                    */
@@ -137,160 +140,6 @@ type Point = { x0: number; y0: number; x: number; y: number; t0: number }
 
 const clamp01 = (v: number) => Math.max(0, Math.min(v, 1))
 
-/**
- * Draws the scrolling zigzag lines into `svgRef` while `active` is true.
- * Paths are created imperatively (60fps updates would be wasteful through React state)
- * and removed again on cleanup.
- *
- * Time is driven by a virtual clock that only advances while frames are rendered
- * (and by at most MAX_FRAME_DELTA_MS per frame). requestAnimationFrame pauses in
- * background tabs, so using wall-clock time would make every point jump far off
- * screen when the tab regains focus.
- */
-function useZigzag(svgRef: RefObject<SVGSVGElement | null>, active: boolean) {
-  useEffect(() => {
-    const svg = svgRef.current
-    if (!active || !svg) return
-
-    // Show the centered, top-anchored window of simulation space that the old
-    // scale(16/11) transform (origin: top center) used to reveal.
-    const updateViewBox = () => {
-      const k = window.matchMedia(MOBILE_QUERY).matches ? 1 : DESKTOP_LAYOUT_SCALE
-      const w = window.innerWidth
-      const h = window.innerHeight
-      svg.setAttribute('viewBox', `${w / 2 - w / (2 * k)} 0 ${w / k} ${h / k}`)
-    }
-    updateViewBox()
-    window.addEventListener('resize', updateViewBox)
-
-    const tan = Math.tan((ANGLE * Math.PI) / 180)
-    const rows = Math.ceil(window.innerHeight / Y_STEP)
-    const cols = Math.ceil(window.innerWidth / SEGMENT_LENGTH)
-
-    const lines: Point[][] = []
-    const paths: SVGPathElement[] = []
-
-    // Virtual clock in milliseconds.
-    let clock = 0
-    let lastFrameTime = performance.now()
-
-    // --- initial pattern ---
-    for (let i = 0; i < rows; i++) {
-      const yOffset = i * Y_STEP
-      const color = i % 2 === 0 ? COLOR_1 : COLOR_2
-
-      let pathData = ''
-      let x = 0
-      let y = yOffset
-      let alternator = 1
-      const points: Point[] = []
-
-      for (let c = 0; c < cols; c++) {
-        const xNext = x + SEGMENT_LENGTH
-
-        // Lines are fundamentally a triangle wave...
-        const triangleWave = alternator * SEGMENT_LENGTH * tan
-        alternator *= -1
-
-        // ...attenuated by a sine wave on the left side of the screen.
-        const lerpY = clamp01(xNext / window.innerWidth)
-        const sineWave = Math.sin(lerpY * (Math.PI / 2)) * triangleWave
-        const yNext = yOffset + sineWave / 2
-
-        pathData += `L ${xNext} ${yNext} `
-        points.push({ x, y, x0: x, y0: y, t0: clock })
-        x = xNext
-        y = yNext
-      }
-
-      const path = document.createElementNS(SVG_NS, 'path')
-      path.setAttribute('d', `M 0 ${yOffset} ` + pathData)
-      path.setAttribute('stroke', color)
-      path.setAttribute('stroke-width', '40')
-      path.setAttribute('fill', 'none')
-      path.setAttribute('stroke-linecap', 'round')
-      path.setAttribute('stroke-linejoin', 'round')
-      path.setAttribute('class', 'zigzag-line')
-      svg.appendChild(path)
-
-      lines.push(points)
-      paths.push(path)
-    }
-
-    // --- animation ---
-    const createNewColumn = () => {
-      for (let i = 0; i < lines.length; i++) {
-        const points = lines[i]
-        const prev = points[points.length - 1]
-        const xNext = prev.x + SEGMENT_LENGTH
-        const middleY = i * Y_STEP
-        const alternator = prev.y < middleY ? 1 : -1
-        const triangleWave = alternator * SEGMENT_LENGTH * tan
-        // This point is off-screen, so the sine attenuation is maxed out (no-op).
-        const yNext = middleY + triangleWave / 2
-        points.push({ x0: xNext, y0: yNext, x: xNext, y: yNext, t0: clock })
-      }
-    }
-
-    const removeFrontColumn = () => {
-      for (const points of lines) {
-        if (points.length > 1) points.shift()
-      }
-    }
-
-    const update = () => {
-      let createNew = false
-      let removeFront = false
-
-      for (let i = 0; i < lines.length; i++) {
-        const points = lines[i]
-        const middleY = i * Y_STEP
-
-        for (const p of points) {
-          const t = (clock - p.t0) / 1000
-          p.x = p.x0 - t * 30 - Math.exp(t * 0.14)
-          const lerpY = clamp01(p.x / window.innerWidth)
-          p.y = (p.y0 - middleY) * Math.sin(lerpY * (Math.PI / 2)) + middleY
-        }
-
-        if (points[points.length - 1].x < window.innerWidth + SEGMENT_LENGTH) createNew = true
-        if (points[0].x < -SEGMENT_LENGTH * 20) removeFront = true
-      }
-
-      if (createNew) createNewColumn()
-      if (removeFront) removeFrontColumn()
-    }
-
-    const render = () => {
-      for (let i = 0; i < lines.length; i++) {
-        const points = lines[i]
-        let d = `M ${points[0].x} ${points[0].y} `
-        for (let j = 1; j < points.length; j++) d += `L ${points[j].x} ${points[j].y} `
-        paths[i].setAttribute('d', d)
-      }
-    }
-
-    let raf = requestAnimationFrame(function loop(ts) {
-      raf = requestAnimationFrame(loop)
-
-      // Advance the virtual clock only by the (capped) time since the last rendered frame.
-      const delta = Math.min(Math.max(ts - lastFrameTime, 0), MAX_FRAME_DELTA_MS)
-      lastFrameTime = ts
-      clock += delta
-
-      update()
-      render()
-    })
-
-    return () => {
-      cancelAnimationFrame(raf)
-      window.removeEventListener('resize', updateViewBox)
-      svg.removeAttribute('viewBox')
-      for (const path of paths) path.remove()
-    }
-  }, [svgRef, active])
-}
-
 /* -------------------------------------------------------------------------- */
 /* Icons                                                                      */
 /* -------------------------------------------------------------------------- */
@@ -370,8 +219,8 @@ function DiscordIcon() {
 type SelectedFeature = { kind: 'os-model' } | { kind: 'feature'; index: number }
 
 export default function Page() {
+  const router = useRouter()
   const [marks, setMarks] = useState<number[]>(() => Array(TOTAL_PIECES).fill(0))
-  const [revealed, setRevealed] = useState(false)
   const [selected, setSelected] = useState<SelectedFeature | null>(null)
 
   const [gameMode, setGameMode] = useState(false)
@@ -380,7 +229,6 @@ export default function Page() {
   const [submitted, setSubmitted] = useState(false)
   const [completionSize, setCompletionSize] = useState<{ width: number; height: number } | null>(null)
 
-  const svgRef = useRef<SVGSVGElement>(null)
   const featureDialogRef = useRef<HTMLDialogElement>(null)
   const waitlistDialogRef = useRef<HTMLDialogElement>(null)
   const waitFormRef = useRef<HTMLFormElement>(null)
@@ -388,9 +236,7 @@ export default function Page() {
   const disableHoverSound = useRef(false)
 
   const coloredCount = marks.filter(Boolean).length
-  const rainbow = coloredCount === TOTAL_PIECES || revealed
-
-  useZigzag(svgRef, revealed)
+  const rainbow = coloredCount === TOTAL_PIECES || appStore.zigzagRevealed
 
   // ---- sounds (document-level delegation covers every button / link / cell) ----
   useEffect(() => {
@@ -437,7 +283,7 @@ export default function Page() {
 
     if (next.filter(Boolean).length === TOTAL_PIECES) {
       if (marks[markIndex] === 0) play('/pew.wav')
-      setRevealed(true)
+      appStore.setZigzagRevealed(true)
     }
   }
 
@@ -449,7 +295,7 @@ export default function Page() {
         play('/bloop.wav')
         return
       } else if (e.ctrlKey && e.key === 't') {
-        setRevealed(true)
+        appStore.setZigzagRevealed(true)
         play('/pew.wav')
       }
       if (!gameMode) return
@@ -558,11 +404,7 @@ export default function Page() {
 
   return (
     <>
-      <div id="background">
-        <svg id="zigzag-svg" ref={svgRef} />
-        <div id="tint" />
-        <div id="gradient" />
-      </div>
+      <ZigzagBackground/>
 
       <div className="page">
         <div className="container-socials-wrap">
@@ -612,7 +454,7 @@ export default function Page() {
               <button type="button" onClick={() => waitlistDialogRef.current?.showModal()}>
                 <span>WAIT</span>
               </button>
-              <button type="button" disabled className="sub-button">
+              <button type="button" onClick={() => router.push('/infer')} className="sub-button">
                 <span>GO</span>
               </button>
             </div>
