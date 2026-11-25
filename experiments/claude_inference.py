@@ -33,6 +33,7 @@ from urllib.parse import urljoin, urlparse
 import modal
 
 MODEL_ID = "Qwen/Qwen3-0.6B"
+# MODEL_ID = "Qwen/Qwen3.5-0.8B"
 MODEL_CACHE_DIR = "/model-cache"
 APP_NAME = "claude-inference"
 ENDPOINT_FUNCTION = "infer"
@@ -58,6 +59,7 @@ model_cache = modal.Volume.from_name("qwen-model-cache", create_if_missing=True)
 # --------------------------------------------------------------------------
 # Cache priming: downloads the model into the Volume and logs percentages.
 # --------------------------------------------------------------------------
+
 @app.function(
     image=image,
     volumes={MODEL_CACHE_DIR: model_cache},
@@ -65,7 +67,26 @@ model_cache = modal.Volume.from_name("qwen-model-cache", create_if_missing=True)
 )
 def download_model():
     from huggingface_hub import snapshot_download
+    from huggingface_hub.errors import LocalEntryNotFoundError
     from tqdm.auto import tqdm
+
+    # Refresh the Volume before checking its contents.
+    model_cache.reload()
+
+    # Check whether the model is already cached.
+    try:
+        path = snapshot_download(
+            MODEL_ID,
+            local_files_only=True,
+        )
+
+        print(f"{MODEL_ID} is already cached.")
+        print(f"Cache location: {path}")
+        print("Skipping download.")
+        return
+
+    except LocalEntryNotFoundError:
+        print(f"{MODEL_ID} not found in cache. Downloading...")
 
     class _Null:
         def write(self, _s):
@@ -75,39 +96,65 @@ def download_model():
             pass
 
     class PrintProgress(tqdm):
-        """tqdm replacement that logs a plain line every 5% (readable in Modal logs)."""
+        """Log a plain line every 5% for readable Modal logs."""
 
         def __init__(self, *args, **kwargs):
-            kwargs.pop("name", None)  # huggingface_hub passes this extra kwarg
+            kwargs.pop("name", None)
             kwargs["disable"] = False
-            kwargs["file"] = _Null()  # silence the default carriage-return bar
+            kwargs["file"] = _Null()
             super().__init__(*args, **kwargs)
+
             self._last_pct = -1
+
             if self.total and self.unit == "B":
                 print(
-                    f"[{self.desc}] starting, {tqdm.format_sizeof(self.total, suffix='B', divisor=1000)} total",
+                    f"[{self.desc}] starting, "
+                    f"{tqdm.format_sizeof(self.total, suffix='B', divisor=1000)} total",
                     flush=True,
                 )
 
         def update(self, n=1):
             out = super().update(n)
+
             if self.total:
                 pct = int(100 * self.n / self.total)
+
                 if pct // 5 > self._last_pct // 5:
                     self._last_pct = pct
+
                     if self.unit == "B":
-                        done = tqdm.format_sizeof(self.n, suffix="B", divisor=1000)
-                        total = tqdm.format_sizeof(self.total, suffix="B", divisor=1000)
-                        print(f"[{self.desc}] {pct:3d}%  {done} / {total}", flush=True)
+                        done = tqdm.format_sizeof(
+                            self.n, suffix="B", divisor=1000
+                        )
+                        total = tqdm.format_sizeof(
+                            self.total, suffix="B", divisor=1000
+                        )
+
+                        print(
+                            f"[{self.desc}] {pct:3d}% {done} / {total}",
+                            flush=True,
+                        )
                     else:
-                        print(f"[{self.desc}] {pct:3d}%  {int(self.n)} / {int(self.total)}", flush=True)
+                        print(
+                            f"[{self.desc}] {pct:3d}% "
+                            f"{int(self.n)} / {int(self.total)}",
+                            flush=True,
+                        )
+
             return out
 
-    print(f"Downloading {MODEL_ID} into {MODEL_CACHE_DIR} ...", flush=True)
-    path = snapshot_download(MODEL_ID, tqdm_class=PrintProgress)
-    model_cache.commit()  # make the files visible to other containers
+    print(f"Downloading {MODEL_ID} into {MODEL_CACHE_DIR}...", flush=True)
 
-    files = [f for f in os.listdir(path)]
+    path = snapshot_download(
+        MODEL_ID,
+        tqdm_class=PrintProgress,
+    )
+
+    # Persist downloaded files to the Modal Volume.
+    model_cache.commit()
+
+    files = os.listdir(path)
+
     print(f"Done. Cached at {path}", flush=True)
     print(f"Files: {', '.join(sorted(files))}", flush=True)
 
