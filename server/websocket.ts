@@ -2,54 +2,57 @@ import { WebSocket, WebSocketServer } from "ws";
 import { spawn, ChildProcess } from "child_process";
 import path from "path";
 
-const PORT = 3001;
+const PORT = Number(process.env.PORT) || 3001;
 
 const PYTHON_DIR = path.resolve(process.cwd(), "python");
-const MODAL_BIN = process.env.MODAL_BIN || path.join(PYTHON_DIR, ".venv", "bin", "modal");
-
-const wss = new WebSocketServer({ port: PORT });
+const MODAL_BIN =
+  process.env.MODAL_BIN ||
+  path.join(PYTHON_DIR, ".venv", "bin", "modal");
 
 type DownloadStatus = "idle" | "running" | "completed" | "failed";
 
-let status: DownloadStatus = "idle";
-let processInstance: ChildProcess | null = null;
+type ClientSession = {
+  status: DownloadStatus;
+  process: ChildProcess | null;
+  recentLogs: string[];
+};
 
-const recentLogs: string[] = [];
 const MAX_LOGS = 100;
 
-function broadcast(data: object) {
-  const message = JSON.stringify(data);
+const wss = new WebSocketServer({ port: PORT });
 
-  for (const client of wss.clients) {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(message);
-    }
+function broadcast(socket: WebSocket, data: object) {
+  if (socket.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify(data));
   }
 }
 
-function log(line: string, stream: string) {
-  // Remove terminal ANSI escape sequences.
-  const clean = line.replace(/\x1B\[[0-?]*\*?[-/]*\*?[@-~]/g, "");
+function log(
+  session: ClientSession,
+  socket: WebSocket,
+  line: string,
+  stream: string,
+) {
+  const clean = line.replace(/\x1B\[[0-?]*[ -/]*[@-~]/g, "");
 
   if (!clean.trim()) return;
 
-  recentLogs.push(clean);
+  session.recentLogs.push(clean);
 
-  if (recentLogs.length > MAX_LOGS) {
-    recentLogs.shift();
+  if (session.recentLogs.length > MAX_LOGS) {
+    session.recentLogs.shift();
   }
 
-  broadcast({
+  broadcast(socket, {
     type: "download:log",
     message: clean,
     stream,
   });
 
-  // Extract percentages from Modal progress output.
   const match = clean.match(/\b(\d{1,3})%/);
 
   if (match) {
-    broadcast({
+    broadcast(socket, {
       type: "download:progress",
       percent: Math.min(100, Number(match[1])),
       message: clean,
@@ -57,42 +60,47 @@ function log(line: string, stream: string) {
   }
 }
 
-function startDownload() {
-  // Avoid launching multiple downloads simultaneously.
-  if (status === "running") {
-    broadcast({ type: "download:status", status });
+function startDownload(session: ClientSession, socket: WebSocket) {
+  if (session.status === "running") {
+    broadcast(socket, {
+      type: "download:status",
+      status: session.status,
+    });
     return;
   }
 
-  if (status === "completed") {
-    broadcast({ type: "download:status", status });
+  if (session.status === "completed") {
+    broadcast(socket, {
+      type: "download:status",
+      status: session.status,
+    });
     return;
   }
 
-  status = "running";
-  recentLogs.length = 0;
+  session.status = "running";
+  session.recentLogs = [];
 
-  broadcast({
+  broadcast(socket, {
     type: "download:status",
     status: "running",
   });
 
   console.log("Starting Modal model download...");
 
-  processInstance = spawn(MODAL_BIN, ["run", "claude_inference.py::download"], {
+  const child = spawn(MODAL_BIN, ["run", "claude_inference.py::download"], {
     cwd: PYTHON_DIR,
     env: process.env,
     shell: false,
   });
 
+  session.process = child;
+
   let stdoutBuffer = "";
   let stderrBuffer = "";
 
-  // Handle stdout.
-  processInstance.stdout?.on("data", (data: Buffer) => {
+  child.stdout?.on("data", (data: Buffer) => {
     const output = data.toString();
 
-    // Print raw output to Node.js console.
     console.log(`[Modal stdout] ${output}`);
 
     stdoutBuffer += output;
@@ -101,15 +109,13 @@ function startDownload() {
     stdoutBuffer = lines.pop() ?? "";
 
     for (const line of lines) {
-      log(line, "stdout");
+      log(session, socket, line, "stdout");
     }
   });
 
-  // Handle stderr.
-  processInstance.stderr?.on("data", (data: Buffer) => {
+  child.stderr?.on("data", (data: Buffer) => {
     const output = data.toString();
 
-    // Print raw output to Node.js console.
     console.error(`[Modal stderr] ${output}`);
 
     stderrBuffer += output;
@@ -118,90 +124,89 @@ function startDownload() {
     stderrBuffer = lines.pop() ?? "";
 
     for (const line of lines) {
-      log(line, "stderr");
+      log(session, socket, line, "stderr");
     }
   });
 
-  processInstance.on("error", (error) => {
+  child.on("error", (error) => {
     console.error("[Modal spawn error]", error);
-    console.error("[Modal error code]", (error as NodeJS.ErrnoException).code);
 
-    log(error.message, "error");
+    log(session, socket, error.message, "error");
 
-    status = "failed";
+    session.status = "failed";
+    session.process = null;
 
-    broadcast({
+    broadcast(socket, {
       type: "download:status",
       status: "failed",
       error: error.message,
     });
-
-    processInstance = null;
   });
 
-  processInstance.on("close", (code, signal) => {
-    if (stdoutBuffer.trim()) log(stdoutBuffer, "stdout");
-    if (stderrBuffer.trim()) log(stderrBuffer, "stderr");
+  child.on("close", (code, signal) => {
+    if (stdoutBuffer.trim()) {
+      log(session, socket, stdoutBuffer, "stdout");
+    }
+
+    if (stderrBuffer.trim()) {
+      log(session, socket, stderrBuffer, "stderr");
+    }
 
     console.log("[Modal process closed]", {
       code,
       signal,
     });
 
-    status = code === 0 ? "completed" : "failed";
+    session.status = code === 0 ? "completed" : "failed";
+    session.process = null;
 
-    broadcast({
+    broadcast(socket, {
       type: "download:status",
-      status,
+      status: session.status,
       exitCode: code,
       signal,
     });
-
-    processInstance = null;
   });
 }
 
 wss.on("connection", (socket) => {
   console.log("WebSocket client connected.");
 
-  // Give newly connected clients the current state.
-  socket.send(
-    JSON.stringify({
-      type: "download:status",
-      status,
-    }),
-  );
+  const session: ClientSession = {
+    status: "idle",
+    process: null,
+    recentLogs: [],
+  };
 
-  // Replay recent output.
-  for (const message of recentLogs) {
-    socket.send(
-      JSON.stringify({
-        type: "download:log",
-        message,
-        stream: "history",
-      }),
-    );
-  }
+  broadcast(socket, {
+    type: "download:status",
+    status: session.status,
+  });
 
   socket.on("message", (raw) => {
     try {
       const data = JSON.parse(raw.toString());
 
       if (data.type === "download:start") {
-        startDownload();
+        startDownload(session, socket);
       }
     } catch {
-      socket.send(
-        JSON.stringify({
-          type: "error",
-          message: "Invalid WebSocket message.",
-        }),
-      );
+      broadcast(socket, {
+        type: "error",
+        message: "Invalid WebSocket message.",
+      });
     }
   });
 
   socket.on("close", () => {
     console.log("WebSocket client disconnected.");
+
+    // Stop this user's download when they disconnect.
+    if (session.process) {
+      session.process.kill("SIGTERM");
+      session.process = null;
+      session.status = "idle";
+    }
   });
 });
 
