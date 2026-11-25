@@ -1,4 +1,3 @@
-
 import { WebSocket, WebSocketServer } from "ws";
 import { spawn, ChildProcess } from "child_process";
 import path from "path";
@@ -6,6 +5,7 @@ import path from "path";
 const PORT = 3001;
 
 const PYTHON_DIR = path.resolve(process.cwd(), "python");
+const MODAL_BIN = process.env.MODAL_BIN || path.join(PYTHON_DIR, ".venv", "bin", "modal");
 
 const wss = new WebSocketServer({ port: PORT });
 
@@ -29,7 +29,7 @@ function broadcast(data: object) {
 
 function log(line: string, stream: string) {
   // Remove terminal ANSI escape sequences.
-  const clean = line.replace(/\x1B\[[0-?]*[ -/]*[@-~]/g, "");
+  const clean = line.replace(/\x1B\[[0-?]*\*?[-/]*\*?[@-~]/g, "");
 
   if (!clean.trim()) return;
 
@@ -45,7 +45,7 @@ function log(line: string, stream: string) {
     stream,
   });
 
-  // Extract percentages from the Modal progress output.
+  // Extract percentages from Modal progress output.
   const match = clean.match(/\b(\d{1,3})%/);
 
   if (match) {
@@ -63,6 +63,7 @@ function startDownload() {
     broadcast({ type: "download:status", status });
     return;
   }
+
   if (status === "completed") {
     broadcast({ type: "download:status", status });
     return;
@@ -78,21 +79,23 @@ function startDownload() {
 
   console.log("Starting Modal model download...");
 
-  processInstance = spawn(
-    "modal",
-    ["run", "claude_inference.py::download"],
-    {
-      cwd: PYTHON_DIR,
-      env: process.env,
-      shell: false,
-    }
-  );
+  processInstance = spawn(MODAL_BIN, ["run", "claude_inference.py::download"], {
+    cwd: PYTHON_DIR,
+    env: process.env,
+    shell: false,
+  });
 
   let stdoutBuffer = "";
   let stderrBuffer = "";
 
+  // Handle stdout.
   processInstance.stdout?.on("data", (data: Buffer) => {
-    stdoutBuffer += data.toString();
+    const output = data.toString();
+
+    // Print raw output to Node.js console.
+    console.log(`[Modal stdout] ${output}`);
+
+    stdoutBuffer += output;
 
     const lines = stdoutBuffer.split(/\r?\n/);
     stdoutBuffer = lines.pop() ?? "";
@@ -102,8 +105,14 @@ function startDownload() {
     }
   });
 
+  // Handle stderr.
   processInstance.stderr?.on("data", (data: Buffer) => {
-    stderrBuffer += data.toString();
+    const output = data.toString();
+
+    // Print raw output to Node.js console.
+    console.error(`[Modal stderr] ${output}`);
+
+    stderrBuffer += output;
 
     const lines = stderrBuffer.split(/\r?\n/);
     stderrBuffer = lines.pop() ?? "";
@@ -114,7 +123,11 @@ function startDownload() {
   });
 
   processInstance.on("error", (error) => {
+    console.error("[Modal spawn error]", error);
+    console.error("[Modal error code]", (error as NodeJS.ErrnoException).code);
+
     log(error.message, "error");
+
     status = "failed";
 
     broadcast({
@@ -126,9 +139,14 @@ function startDownload() {
     processInstance = null;
   });
 
-  processInstance.on("close", (code) => {
+  processInstance.on("close", (code, signal) => {
     if (stdoutBuffer.trim()) log(stdoutBuffer, "stdout");
     if (stderrBuffer.trim()) log(stderrBuffer, "stderr");
+
+    console.log("[Modal process closed]", {
+      code,
+      signal,
+    });
 
     status = code === 0 ? "completed" : "failed";
 
@@ -136,11 +154,10 @@ function startDownload() {
       type: "download:status",
       status,
       exitCode: code,
+      signal,
     });
 
     processInstance = null;
-
-    console.log(`Modal download finished with exit code ${code}`);
   });
 }
 
@@ -152,17 +169,17 @@ wss.on("connection", (socket) => {
     JSON.stringify({
       type: "download:status",
       status,
-    })
+    }),
   );
 
-  // Replay recent output if a download is running.
+  // Replay recent output.
   for (const message of recentLogs) {
     socket.send(
       JSON.stringify({
         type: "download:log",
         message,
         stream: "history",
-      })
+      }),
     );
   }
 
@@ -178,7 +195,7 @@ wss.on("connection", (socket) => {
         JSON.stringify({
           type: "error",
           message: "Invalid WebSocket message.",
-        })
+        }),
       );
     }
   });

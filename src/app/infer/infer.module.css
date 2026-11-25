@@ -287,3 +287,37 @@
     font-size: 10px;
   }
 }
+
+.downloadProgress {
+  padding: 16px;
+  border: 1px solid #333;
+  margin-bottom: 16px;
+  font-family: monospace;
+}
+
+.downloadProgress > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 12px;
+}
+
+.progressTrack {
+  height: 4px;
+  background: #333;
+  overflow: hidden;
+}
+
+.progressBar {
+  height: 100%;
+  background: #fff;
+  transition: width 300ms ease;
+}
+
+.downloadProgress pre {
+  margin-top: 12px;
+  font-size: 11px;
+  color: #999;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

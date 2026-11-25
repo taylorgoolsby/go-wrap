@@ -53,7 +53,7 @@ image = (
 )
 
 # Persist downloaded weights so cold starts don't re-download the model.
-model_cache = modal.Volume.from_name("qwen-model-cache", create_if_missing=True)
+model_cache = modal.Volume.from_name("model-cache", create_if_missing=True)
 
 
 # --------------------------------------------------------------------------
