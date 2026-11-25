@@ -4,7 +4,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import styles from "./infer.module.css";
-import ZigzagBackground from '@/components/ZigzagBackground'
+import ZigzagBackground from '@/src/components/ZigzagBackground'
 
 type Message = {
   role: "user" | "assistant";

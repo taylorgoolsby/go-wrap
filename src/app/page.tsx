@@ -11,8 +11,8 @@ import {
   type RefObject,
 } from 'react'
 import {useRouter} from 'next/navigation'
-import ZigzagBackground from '@/components/ZigzagBackground'
-import appStore from '@/stores/AppStore'
+import ZigzagBackground from '@/src/components/ZigzagBackground'
+import appStore from '@/src/stores/AppStore'
 
 /* -------------------------------------------------------------------------- */
 /* Content                                                                    */

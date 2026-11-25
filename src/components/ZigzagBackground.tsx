@@ -2,8 +2,8 @@
 
 import { useRef } from 'react'
 import { observer } from 'mobx-react-lite'
-import appStore from '@/stores/AppStore'
-import { useZigzag } from '@/hooks/useZigzag'
+import appStore from '@/src/stores/AppStore'
+import { useZigzag } from '@/src/hooks/useZigzag'
 
 export default observer(function ZigzagBackground() {
   const svgRef = useRef<SVGSVGElement>(null)
