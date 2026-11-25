@@ -70,7 +70,7 @@ a:hover {
   background: linear-gradient(90deg, rgba(215, 215, 255, 0.2), rgba(0, 100, 255, 0.2));
   mix-blend-mode: lighten;
 }
-*:not(#zigzag-svg) {
+*:not(#zigzag-svg):not(.combobox-dropdown) {
   z-index: 2;
 }
 
@@ -309,6 +309,22 @@ textarea {
 }
 textarea {
   resize: vertical;
+}
+
+.combobox {
+  position: relative;
+}
+
+.combobox-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+}
+
+.combobox-dropdown option:hover {
+  background-color: rgba(197, 212, 255, 0.3);
 }
 
 /* ---- links & icons ----------------------------------------------------- */

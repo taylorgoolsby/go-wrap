@@ -1,17 +1,17 @@
-// infer/page.tsx
 "use client";
 
 import { useState } from "react";
 import Link from "next/link";
 import styles from "./infer.module.css";
-import ZigzagBackground from '@/src/components/ZigzagBackground'
+import ZigzagBackground from "@/src/components/ZigzagBackground";
+import Combobox from "@/src/components/Combobox";
 
 type Message = {
   role: "user" | "assistant";
   content: string;
 };
 
-const models = ["Llama 3.2 3B", "Qwen 3 4B", "Ministral 8B"];
+const models = ["meta-llama/Llama-3.2-3B", "Qwen/Qwen3-4B", "mistralai/Ministral-8B-Instruct-2410"];
 
 export default function InferPage() {
   const [model, setModel] = useState(models[0]);
@@ -24,13 +24,17 @@ export default function InferPage() {
     const value = prompt.trim();
     if (!value) return;
 
-    setMessages((previous) => [...previous, { role: "user", content: value }]);
+    setMessages((previous) => [
+      ...previous,
+      { role: "user", content: value },
+    ]);
+
     setPrompt("");
   }
 
   return (
     <>
-      <ZigzagBackground/>
+      <ZigzagBackground />
 
       <main className={styles.page}>
         <header className={styles.header}>
@@ -38,7 +42,9 @@ export default function InferPage() {
             GO-WRAP
           </Link>
 
-          <span className={styles.headerLabel}>INFERENCE PLAYGROUND</span>
+          <span className={styles.headerLabel}>
+            INFERENCE PLAYGROUND
+          </span>
         </header>
 
         <section className={styles.content}>
@@ -49,17 +55,13 @@ export default function InferPage() {
 
           <div className={styles.modelSelector}>
             <label htmlFor="model">MODEL</label>
-            <select
-              id="model"
+
+            <Combobox
+              options={models}
               value={model}
-              onChange={(event) => setModel(event.target.value)}
-            >
-              {models.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
+              onChange={setModel}
+              placeholder="Select a model..."
+            />
           </div>
 
           <div className={styles.chat}>
@@ -79,7 +81,9 @@ export default function InferPage() {
                         : styles.assistantMessage
                     }`}
                   >
-                    <span>{message.role === "user" ? "YOU" : "MODEL"}</span>
+                    <span>
+                      {message.role === "user" ? "YOU" : "MODEL"}
+                    </span>
                     <p>{message.content}</p>
                   </div>
                 ))}
