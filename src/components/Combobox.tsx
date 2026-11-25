@@ -48,7 +48,7 @@ export default function Combobox({
       {isOpen && (
         <select
           className="combobox-dropdown"
-          size={options.length}
+          size={Math.min(options.length + 1, 10)}
           value=""
           onChange={(event) => {
             onChange(event.target.value);

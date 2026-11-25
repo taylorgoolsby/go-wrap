@@ -37,7 +37,7 @@ a:hover {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 0;
+  z-index: -100;
 }
 #zigzag-svg {
   position: absolute;
@@ -47,7 +47,7 @@ a:hover {
   bottom: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 0;
+  z-index: -100;
 }
 #tint {
   position: absolute;
@@ -55,7 +55,7 @@ a:hover {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 1;
+  z-index: -99;
   background-color: #7a7aff;
   opacity: 0.1;
   mix-blend-mode: plus-lighter;
@@ -66,13 +66,13 @@ a:hover {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 1;
+  z-index: -99;
   background: linear-gradient(90deg, rgba(215, 215, 255, 0.2), rgba(0, 100, 255, 0.2));
   mix-blend-mode: lighten;
 }
-*:not(#zigzag-svg):not(.combobox-dropdown) {
+/* *:not(#zigzag-svg):not(.combobox-dropdown) {
   z-index: 2;
-}
+} */
 
 /* ---- layout ------------------------------------------------------------ */
 h1,
